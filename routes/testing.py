@@ -3,6 +3,7 @@ from pathlib import Path
 import json
 import time
 import threading
+import uuid
 
 from flask import Blueprint, jsonify, render_template, request, Response
 
@@ -10,11 +11,13 @@ from core.translators.csv_loader import CSVConfigLoader
 from services.forge_client import ForgeClient
 from services.osdp_flasher import OsdpFlasher
 from services.slack_client import SlackNotificationManager
+from services.test_session_manager import TestSessionManager
 
 
 testing_bp = Blueprint("testing", __name__, url_prefix="/testing")
 loader = CSVConfigLoader()
 slack_manager = SlackNotificationManager()
+session_manager = TestSessionManager()
 
 # In-memory store: { "v5.4.11": { "session_123": { "id": ..., "created_at": ..., "configs": { ... } } } }
 VERSION_SESSIONS = {}
@@ -177,16 +180,19 @@ def portal():
     return render_template("testing-portal.html", firmware_versions=version_summaries)
 
 
+def sync_sessions_from_db(version: str):
+    """Helper to sync sessions from PocketBase into VERSION_SESSIONS."""
+    if version not in VERSION_SESSIONS:
+        VERSION_SESSIONS[version] = {}
+    
+    db_sessions = session_manager.fetch_all_sessions()
+    for s in db_sessions:
+        if s.get("version") == version and "id" in s:
+            VERSION_SESSIONS[version][s["id"]] = s
+
 @testing_bp.route("/version/<version>")
 def view_version_workspace(version: str):
-    """Renders the test workspace for a specific firmware version.
-
-    Args:
-        version (str): Target firmware version string.
-
-    Returns:
-        str: Rendered HTML template response.
-    """
+    sync_sessions_from_db(version)  # Load persisted sessions on workspace load
     configs = loader.list_all_configurations()
     sessions = list(VERSION_SESSIONS.get(version, {}).values())
 
@@ -197,6 +203,59 @@ def view_version_workspace(version: str):
         team_members=TEAM_MEMBERS,
         sessions=sessions,
     )
+
+@testing_bp.route("/api/create-session", methods=["POST"])
+def create_version_session():
+    """Creates a new test session containing selected configurations."""
+    data = request.get_json() or request.form or {}
+    version = data.get("version") or "v5.4.11"
+    title = data.get("title") or f"{version} Test Session"
+    selected_filenames = data.get("configs", []) or data.get("selected_configs", [])
+
+    if not selected_filenames:
+        return jsonify({"success": False, "error": "No configurations selected."}), 400
+
+    session_id = f"session_{uuid.uuid4().hex[:8]}"
+    configs_map = {}
+
+    for filename in selected_filenames:
+        config_obj = loader.load_by_filename(filename)
+        if config_obj:
+            configs_map[filename] = {
+                "config_name": config_obj.config_name,
+                "filename": filename,
+                "status": "UNTESTED",
+                "assigned_to": "Unassigned",
+                "notes": "",
+                "sections": generate_structured_sections(config_obj),
+            }
+
+    session_payload = {
+        "id": session_id,
+        "session_id": session_id,
+        "title": title,
+        "version": version,
+        "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "status": "IN_PROGRESS",
+        "configs": configs_map,
+    }
+
+    # 1. Update in-memory storage
+    if version not in VERSION_SESSIONS:
+        VERSION_SESSIONS[version] = {}
+    VERSION_SESSIONS[version][session_id] = session_payload
+
+    # 2. Persist to PocketBase
+    try:
+        session_manager.create_session(session_payload)
+    except Exception as e:
+        print(f"[Warning] Failed to save session to PocketBase: {e}")
+
+    return jsonify({
+        "success": True,
+        "session_id": session_id,
+        "redirect_url": f"/testing/version/{version}/session/{session_id}"
+    }), 201
 
 
 @testing_bp.route("/version/<version>/session/<session_id>")
@@ -239,16 +298,6 @@ def view_session_page(version: str, session_id: str):
 
 @testing_bp.route("/version/<version>/session/<session_id>/run/<filename>")
 def run_test_case_page(version: str, session_id: str, filename: str):
-    """Renders the execution page for a single configuration test case.
-
-    Args:
-        version (str): Target firmware version string.
-        session_id (str): Unique test session identifier.
-        filename (str): The configuration CSV file name.
-
-    Returns:
-        Response: Rendered template response or 404 error page.
-    """
     if version not in VERSION_SESSIONS or session_id not in VERSION_SESSIONS[version]:
         return "Test Session not found", 404
 
@@ -256,6 +305,10 @@ def run_test_case_page(version: str, session_id: str, filename: str):
     test_case = session["configs"].get(filename)
     if not test_case:
         return "Configuration test case not in this session", 404
+
+    # Ensure status always defaults to 'UNTESTED' if missing
+    if "status" not in test_case or not test_case["status"]:
+        test_case["status"] = "UNTESTED"
 
     return render_template(
         "test-run.html",
@@ -265,53 +318,19 @@ def run_test_case_page(version: str, session_id: str, filename: str):
     )
 
 
-@testing_bp.route("/api/create-session", methods=["POST"])
+@testing_bp.route("/api/test-sessions", methods=["GET"])
+def get_sessions():
+    sessions = session_manager.fetch_all_sessions()
+    return jsonify({"success": True, "sessions": sessions}), 200
+
+@testing_bp.route("/api/test-sessions", methods=["POST"])
 def create_session():
-    """API endpoint to create a new testing session.
-
-    Returns:
-        Response: JSON payload indicating success and the new session ID.
-    """
-    payload = request.get_json() or {}
-    version = payload.get("version", "v5.4.11")
-    selected_filenames = payload.get("configs", [])
-    session_title = payload.get("title", "").strip() or f"{version} Test Session"
-
-    if not selected_filenames:
-        return jsonify({"success": False, "error": "Please select at least one configuration."}), 400
-
-    if version not in VERSION_SESSIONS:
-        VERSION_SESSIONS[version] = {}
-
-    session_id = f"sess_{int(datetime.now().timestamp())}"
-    config_cases = {}
-
-    for filename in selected_filenames:
-        config_obj = loader.load_by_filename(filename)
-        if config_obj:
-            sections = generate_structured_sections(config_obj)
-            config_cases[filename] = {
-                "filename": filename,
-                "config_name": config_obj.config_name,
-                "version": version,
-                "assigned_to": "Unassigned",
-                "status": "UNTESTED",
-                "sections": sections,
-                "notes": "",
-            }
-
-    session_data = {
-        "session_id": session_id,
-        "title": session_title,
-        "version": version,
-        "created_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
-        "status": "IN_PROGRESS",
-        "configs": config_cases,
-    }
-
-    VERSION_SESSIONS[version][session_id] = session_data
-
-    return jsonify({"success": True, "session_id": session_id})
+    data = request.get_json() or {}
+    try:
+        session_record = session_manager.create_session(data)
+        return jsonify({"success": True, "session": session_record}), 201
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
 @testing_bp.route("/api/update-section", methods=["POST"])
