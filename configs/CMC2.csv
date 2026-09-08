@@ -1,0 +1,65 @@
+CMC2 (MCLP),,,,,
+End User Configuration Form,,,,,Card Details
+Config Name,CMC2,,,,Card Type
+Config ID,146,,,,
+STEP 1: Hardware,,,,,Bitstream
+Wiegand/OSDP,ET10,ET20,ET25,,Facility Code
+-2WS,No,No,No,,Starting Badge
+-3WS,No,No,No,,Notes
+-6WS,No,No,No,,
+-7WS,No,No,No,,
+,,,,,
+F2F,ET10,ET20,ET25,,
+-7FM,No,No,No,,Part Numbers
+,,,,,
+MCLP,ET10,ET20,ET25,,
+-7FM,Yes,Yes,Yes,,
+,,,,,Notes/Other Products
+STEP 2: AV + Output Formats,,,,,LED's are off when not connected
+Wiegand/OSDP,,,,,
+Idle LED,,Red,,,
+Credential Report LED,,Green,,,
+Beeper,,On,,,
+Keypad Format,,8-bit,,,
+Tamper Monitoring,,On,,,
+F2F,,,,,
+Casi Output Format,,CASI-4002,,,
+Supervision State,,2-State,,,
+Tamper Monitoring,,On,,,
+STEP 3: HF,,,,,
+Leaf Application,,Leaf Si,,,
+Other Custom HF Application,,None,,,
+"Custom
+Application
+Notes",,,,,
+,,,,,
+,,,,,
+STEP 4: CSN,,,,,
+MFC CSN,,Off,,,
+EV1/EV2 CSN,,Off,,,
+iClass CSN,,Off,,,
+ISO15693 CSN,,Off,,,
+ISO14443A CSN,,Off,,,
+STEP 5: LF,,,,,
+FSK Prox,,On,,,
+ASK Prox,,On,,,
+Prox Filter,,,,,
+Prox Filter,,Off,,,
+"Prox
+Filter
+Description",,,,,
+,,,,,
+,,,,,
+STEP 6: Mobile,,,,,
+BLE Advertising Config,,AMAG,,,
+BLE Functionality,,Admin + Custom Credential,,,
+NFC Functionality,,Disabled,,,
+Mobile Keyset,,AMAG Transport,,,
+Legacy Credentials (Symmetry Blue),,On,,,
+Transport Mode,,Off,,,
+Mobile Notes,,,,,
+STEP 7: Part Numbers,,,,,
+"Assigned 
+Part Numbers","939M-KP-CMC2
+939M-CMC2
+929M-CMC2",,,,

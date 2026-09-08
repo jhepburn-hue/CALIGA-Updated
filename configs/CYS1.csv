@@ -1,0 +1,54 @@
+YourSix,,,,,,
+End User Configuration Form,,,,,,Card Details
+Config Name,CSY1,,,,,Credential Notes
+Config ID,311,,,,,Card Type
+STEP 1: Hardware,,,,,,Bitstream
+Wiegand/OSDP,AX10,AX15,AX20,AX25,,Facility Code
+Ascent,Yes,Yes,Yes,Yes,,Starting Badge
+Summit,Yes,Yes,Yes,Yes,,Notes/Other Products
+Module,No,,,,,
+STEP 2: Custom Keyset,,,,,,
+Custom Keyset (LEAF Cc),,Enabled,,,,
+Keyset ID (LkXXXXX),,Lk50005,,,,
+STEP 3: AV + Output Formats,,,,,,
+Idle LED,,Red,,,,
+Credential Report LED,,Green,,,,
+STEP 4: High Frequency (HF),,,,,,
+Leaf Si Application (Kv1),,Leaf Si,,,,
+Leaf Cc Application (Kc1),,Leaf Cc,,,,
+"Custom
+Application
+Notes",Lk50005,,,,,
+,,,,,,
+,,,,,,
+STEP 5: Card Serial Number (CSN),,,,,,
+MFC CSN,,Off,32-bit MSB,,,
+EV1/EV2 CSN,,Off,32-bit MSB,,,
+iClass CSN,,Off,32-bit MSB,,,
+ISO15693 CSN,,Off,32-bit MSB,,,
+ISO14443A CSN,,Off,32-bit MSB,,,
+STEP 6: Low Frequency (LF),,,,,,
+FSK Prox,,On,,,,
+ASK Prox,,On,,,,
+Prox Filter,,,,,,
+Prox Filter,,Off,,,,
+"Prox
+Filter
+Description",,,,,,
+,,,,,,
+,,,,,,
+STEP 7: BLE,,,,,,
+BLE Advertising Name,,APEX,,,,
+BLE Admin,,Yes,,,,
+BLE Credentials,,MyPass,,,,
+BLE Notes,,,,,,
+,,,,,,
+STEP 8: NFC,,,,,,
+NFC Functionality,,Wallet,,,,
+Mobile Keyset,,Custom,,,,
+Transport Mode,,Off,,,,
+ECP DESFire (Apple Wallet),,Enabled,,,,
+ECP TCI,,020a00,,,,
+Apple Meridian Bit Count,,A00000039656434103F532F000020a00,,,,
+MiFare2Go (Android Wallet),,Enabled,,,,
+Mobile Notes,MyPass and NFC Wallet on the same config. Just like with Apex STND,,,,,

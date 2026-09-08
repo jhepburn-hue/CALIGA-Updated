@@ -1,0 +1,73 @@
+SmartRent (Bluetooth),,,,,
+End User Configuration Form,,,,,Card Details
+Config Name,CSMR1,,,,Card Type
+Config ID,217,,,,Bitstream
+STEP 1: Hardware,,,,,Facility Code
+Wiegand/OSDP,ET10,ET20,ET25,,Starting Badge
+-2WS,No,No,No,,Notes
+-3WS,No,No,No,,NS015
+-6WS,Yes,Yes,Yes,,
+-7WS,Yes,Yes,Yes,,
+,,,,,
+F2F,ET10,ET20,ET25,,Part Numbers
+-7FM,No,No,No,,
+,,,,,
+MCLP,ET10,ET20,ET25,,
+-7FM,No,No,No,,Notes/Other Products
+,,,,,
+STEP 2: Custom Keyset,,,,,
+Custom Keyset (LEAF Cc),,Enabled,,,
+Keyset ID (LkXXXXX),,Lk50013,,,
+LEAF Customer Code (Decimal),,,,,
+STEP 3: AV + Output Formats,,,,,
+Wiegand/OSDP,,,,,
+Idle LED,,Red,,,
+Credential Report LED,,Green,,,
+Beeper,,On,,,
+Keypad Format,,8-bit,,,
+Tamper Monitoring,,On,,,
+F2F,,,,,
+Casi Output Format,,CASI-4002,,,
+Supervision State,,2-State,,,
+Tamper Monitoring,,On,,,
+STEP 4: High Frequency (HF),,,,,
+Leaf Si Application (Kv1),,Leaf Si,,,
+Leaf Cc Application (Kc1),,Leaf Cc,,,
+Other Custom HF Application,,None,,,
+"Custom
+Application
+Notes",Kc1 of Lk50013 and Kv1 of Lk00001,,,,
+,,,,,
+,,,,,
+STEP 5: Card Serial Number (CSN),,,,,
+MFC CSN,,On,Standard,,
+EV1/EV2 CSN,,On,Standard,,
+iClass CSN,,On,Standard,,
+ISO15693 CSN,,On,Standard,,
+ISO14443A CSN,,On,,,
+STEP 6: Low Frequency (LF),,,,,
+FSK Prox,,On,,,
+ASK Prox,,On,,,
+Prox Filter,,,,,
+Prox Filter,,On,,,
+"Prox
+Filter
+Description",Ignores W36-8 format with FC: 7,,,,
+,,,,,
+,,,,,
+STEP 7: Mobile,,,,,
+BLE Advertising Config,,WaveLynx (ETHS),,,
+BLE Functionality,,Admin + Credentials,,,
+NFC Functionality,,Enabled,,,
+Mobile Keyset,,WaveLynx Transport,,,
+"Legacy Credentials (Sym Blue, Brivo)",,Off,,,
+Transport Mode,,On,,,
+ECP DESFire,,Disabled,,,
+ECP TCI,,1,,,
+Apple Meridian Bit Count,,1,,,
+MiFare2Go,,Disabled,,,
+MiFare2Go DFNAME,,1,,,
+Mobile Notes,Use MyPass server / keys with Smartrent custom mobile app,,,,
+STEP 8: Part Numbers,,,,,
+"Assigned 
+Part Numbers",ETxx-xWS-CSMR1-LK50013,,,,

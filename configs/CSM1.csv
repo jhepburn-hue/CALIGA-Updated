@@ -1,0 +1,83 @@
+Stockton Metropolitan Airport,,,,,,
+End User Configuration Form,,,,,Card Details,
+Config Name,CSM1-Lk10066,,,,Card Type,50H4
+Config ID,80,,,,
+STEP 1: Hardware,,,,,Bitstream,W48-0
+Wiegand/OSDP,ET10,ET20,ET25,,Facility Code,617
+-2WS,Yes,Yes,Yes,,Starting Badge,3000
+-3WS,No,No,No,,Notes,
+-6WS,No,No,No,,Issue Code: 0,
+-7WS,No,No,No,,,
+,,,,,,
+F2F,ET10,ET20,ET25,,,
+-7FM,No,No,No,,Part Numbers,
+,,,,,50H4-Lk10066,
+MCLP,ET10,ET20,ET25,,,
+-7FM,No,No,No,,,
+,,,,,Notes/Other Products,
+STEP 2: Custom Keyset,,,,,,
+Custom Keyset,,Enabled,,,,
+Keyset ID,,Lk10066,,,,
+LEAF Customer Code (Decimal),,,,,,
+STEP 3: AV + Output Formats,,,,,,
+Wiegand/OSDP,,,,,,
+Idle LED,,Red,,,,
+Credential Report LED,,Green,,,,
+Beeper,,On,,,,
+Keypad Format,,8-bit,,,,
+Tamper Monitoring,,On,,,,
+F2F,,,,,,
+Casi Output Format,,CASI-4002,,,,
+Supervision State,,2-State,,,,
+Tamper Monitoring,,On,,,,
+STEP 4: High Frequency (HF),,,,,,
+Leaf Application,,Leaf CC,,,,
+Other Custom HF Application,,None,,,,
+"Custom
+Application
+Notes",Lk10066,,,,,
+,,,,,,
+,,,,,,
+STEP 5: Card Serial Number (CSN),,,,,,
+MFC CSN,,Off,,,,
+EV1/EV2 CSN,,Off,,,,
+iClass CSN,,Off,,,,
+ISO15693 CSN,,Off,,,,
+ISO14443A CSN,,Off,,,,
+CSN Format,,,,,,
+STEP 6: Low Frequency (LF),,,,,,
+FSK Prox,,On,,,,
+ASK Prox,,On,,,,
+Prox Filter,,,,,,
+Prox Filter,,Off,,,,
+"Prox
+Filter
+Description",,,,,,
+,,,,,,
+,,,,,,
+STEP 7: Mobile,,,,,,
+BLE Advertising Config,,WaveLynx (ETHS),,,,
+BLE Functionality,,Admin Only,,,,
+NFC Functionality,,Disabled,,,,
+Mobile Keyset,,WaveLynx Transport,,,,
+"Legacy Credentials (Sym Blue, Brivo)",,Off,,,,
+Transport Mode,,On,,,,
+ECP DESFire,,Disabled,,,,
+ECP TCI,,,,,,
+Mobile Notes,,,,,,
+STEP 8: Part Numbers,,,,,,
+"Assigned 
+Part Numbers",ETxx-2WS-CSM1-Lk10066,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+"Wiegand/OSDP environment
+
+Customer is Rip and Replacing
+
+
+The Customer ONLY wants HF technology, not LF or BLE. BLE behavior was defined as Admin only incase they ever decided to purchase readers witih Mobile.
+
+- JB",,,,,,

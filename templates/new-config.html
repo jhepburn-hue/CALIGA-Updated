@@ -1,0 +1,140 @@
+<!-- New Configuration Form Template -->
+{% extends 'base.html' %}
+
+{% block title %}New Configuration | Caliga{% endblock %}
+
+{% block content %}
+<div style="padding: 1rem 0;">
+    <!-- Navigation Back Link -->
+    <a href="/configs" style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem;">← Back to all configurations</a>
+
+    <!-- Page Header -->
+    <div style="margin: 1rem 0 1.5rem 0;">
+        <h1 style="font-size: 1.75rem; font-weight: 700;">Create New Configuration</h1>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">Build a new reader configuration file. New configurations start in <strong>POC</strong> status.</p>
+    </div>
+
+    <!-- Configuration Form -->
+    <form method="POST" action="/configs/new">
+        <!-- General Identity Metadata -->
+        <div style="background: var(--bg-surface); border: 1px solid var(--bg-border); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem;">
+            <h2 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; color: var(--accent-primary);">General Identity</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+                <div>
+                    <label class="field-label">Config Name</label>
+                    <input type="text" name="config_name" required placeholder="e.g. CTEST1" class="field-input">
+                </div>
+                <div>
+                    <label class="field-label">Decimal ID</label>
+                    <input type="number" name="config_id_dec" value="{{ next_dec }}" readonly class="field-input">
+                </div>
+                <div>
+                    <label class="field-label">Hex ID</label>
+                    <input type="text" value="{{ next_hex }}" readonly class="field-input">
+                </div>
+            </div>
+        </div>
+
+        <!-- 8 Step Configuration Fields -->
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            
+            <!-- STEP 1: Hardware Support -->
+            <div style="background: var(--bg-surface); border: 1px solid var(--bg-border); border-radius: 8px; padding: 1.5rem;">
+                <h2 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; color: var(--accent-primary);">STEP 1: Hardware Support</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
+                    <div><label class="field-label">Wiegand/OSDP -2WS</label><select name="wiegand_2ws" class="field-input">{% for opt in dropdowns.yes_no %}<option value="{{ opt }}">{{ opt }}</option>{% endfor %}</select></div>
+                    <div><label class="field-label">Wiegand/OSDP -3WS</label><select name="wiegand_3ws" class="field-input">{% for opt in dropdowns.yes_no %}<option value="{{ opt }}">{{ opt }}</option>{% endfor %}</select></div>
+                    <div><label class="field-label">Wiegand/OSDP -6WS</label><select name="wiegand_6ws" class="field-input">{% for opt in dropdowns.yes_no %}<option value="{{ opt }}">{{ opt }}</option>{% endfor %}</select></div>
+                    <div><label class="field-label">Wiegand/OSDP -7WS</label><select name="wiegand_7ws" class="field-input">{% for opt in dropdowns.yes_no %}<option value="{{ opt }}">{{ opt }}</option>{% endfor %}</select></div>
+                    <div><label class="field-label">F2F -7FM</label><select name="f2f_7fm" class="field-input">{% for opt in dropdowns.yes_no %}<option value="{{ opt }}">{{ opt }}</option>{% endfor %}</select></div>
+                    <div><label class="field-label">MCLP -7FM</label><select name="mclp_7fm" class="field-input">{% for opt in dropdowns.yes_no %}<option value="{{ opt }}">{{ opt }}</option>{% endfor %}</select></div>
+                </div>
+            </div>
+
+            <!-- STEP 2: Custom Keyset -->
+            <div style="background: var(--bg-surface); border: 1px solid var(--bg-border); border-radius: 8px; padding: 1.5rem;">
+                <h2 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; color: var(--accent-primary);">STEP 2: Custom Keyset</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
+                    <div><label class="field-label">Keyset ID (LkXXXXX)</label><input type="text" name="keyset_id" placeholder="e.g. Lk10000" class="field-input"></div>
+                </div>
+            </div>
+
+            <!-- STEP 3: AV + Output Formats -->
+            <div style="background: var(--bg-surface); border: 1px solid var(--bg-border); border-radius: 8px; padding: 1.5rem;">
+                <h2 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; color: var(--accent-primary);">STEP 3: AV + Output Formats</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    <div><label class="field-label">Idle LED Color</label><select name="idle_led_color" class="field-input">{% for opt in dropdowns.led_colors %}<option value="{{ opt }}" {% if opt == 'Red' %}selected{% endif %}>{{ opt }}</option>{% endfor %}</select></div>
+                    <div><label class="field-label">Credential Report LED</label><select name="credential_led_color" class="field-input">{% for opt in dropdowns.led_colors %}<option value="{{ opt }}" {% if opt == 'Green' %}selected{% endif %}>{{ opt }}</option>{% endfor %}</select></div>
+                    <div><label class="field-label">Beeper Status</label><select name="beeper_enabled" class="field-input">{% for opt in dropdowns.on_off %}<option value="{{ opt }}" {% if opt == 'On' %}selected{% endif %}>{{ opt }}</option>{% endfor %}</select></div>
+                    <div><label class="field-label">Keypad Format</label><select name="keypad_format" class="field-input">{% for opt in dropdowns.keypad_formats %}<option value="{{ opt }}">{{ opt }}</option>{% endfor %}</select></div>
+                    <div><label class="field-label">Tamper Monitoring</label><select name="tamper_monitoring" class="field-input">{% for opt in dropdowns.on_off %}<option value="{{ opt }}" {% if opt == 'On' %}selected{% endif %}>{{ opt }}</option>{% endfor %}</select></div>
+                </div>
+            </div>
+
+            <!-- STEP 4: High Frequency (HF) -->
+            <div style="background: var(--bg-surface); border: 1px solid var(--bg-border); border-radius: 8px; padding: 1.5rem;">
+                <h2 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; color: var(--accent-primary);">STEP 4: High Frequency (HF)</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+                    <div><label class="field-label">LEAF Si Application (Kv1)</label><select name="leaf_si_app" class="field-input">{% for opt in dropdowns.leaf_si_apps %}<option value="{{ opt }}">{{ opt }}</option>{% endfor %}</select></div>
+                    <div><label class="field-label">LEAF Cc Application (Kc1)</label><input type="text" name="leaf_cc_app" placeholder="e.g. Leaf Cc" class="field-input"></div>
+                    <div><label class="field-label">Other Custom HF Application</label><select name="custom_hf_app" class="field-input">{% for opt in dropdowns.other_hf_apps %}<option value="{{ opt }}">{{ opt }}</option>{% endfor %}</select></div>
+                </div>
+            </div>
+
+            <!-- STEP 5: Card Serial Number (CSN) -->
+            <div style="background: var(--bg-surface); border: 1px solid var(--bg-border); border-radius: 8px; padding: 1.5rem;">
+                <h2 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; color: var(--accent-primary);">STEP 5: Card Serial Number (CSN)</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+                    <div><label class="field-label">MFC CSN</label><select name="mfc_csn" class="field-input">{% for opt in dropdowns.csn_formats %}<option value="{{ opt }}">{{ opt }}</option>{% endfor %}</select></div>
+                    <div><label class="field-label">EV1/EV2 CSN</label><select name="ev1_ev2_csn" class="field-input">{% for opt in dropdowns.csn_formats %}<option value="{{ opt }}">{{ opt }}</option>{% endfor %}</select></div>
+                    <div><label class="field-label">iClass CSN</label><select name="iclass_csn" class="field-input">{% for opt in dropdowns.csn_formats %}<option value="{{ opt }}">{{ opt }}</option>{% endfor %}</select></div>
+                    <div><label class="field-label">ISO15693 CSN</label><select name="iso15693_csn" class="field-input">{% for opt in dropdowns.csn_formats %}<option value="{{ opt }}">{{ opt }}</option>{% endfor %}</select></div>
+                    <div><label class="field-label">ISO14443A CSN</label><select name="iso14443a_csn" class="field-input">{% for opt in dropdowns.csn_formats %}<option value="{{ opt }}">{{ opt }}</option>{% endfor %}</select></div>
+                </div>
+            </div>
+
+            <!-- STEP 6: Low Frequency (LF) -->
+            <div style="background: var(--bg-surface); border: 1px solid var(--bg-border); border-radius: 8px; padding: 1.5rem;">
+                <h2 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; color: var(--accent-primary);">STEP 6: Low Frequency (LF)</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    <div><label class="field-label">FSK Prox</label><select name="fsk_prox" class="field-input">{% for opt in dropdowns.on_off %}<option value="{{ opt }}" {% if opt == 'On' %}selected{% endif %}>{{ opt }}</option>{% endfor %}</select></div>
+                    <div><label class="field-label">ASK Prox</label><select name="ask_prox" class="field-input">{% for opt in dropdowns.on_off %}<option value="{{ opt }}" {% if opt == 'On' %}selected{% endif %}>{{ opt }}</option>{% endfor %}</select></div>
+                    <div><label class="field-label">Prox Filter</label><select name="prox_filter_enabled" class="field-input">{% for opt in dropdowns.on_off %}<option value="{{ opt }}">{{ opt }}</option>{% endfor %}</select></div>
+                </div>
+            </div>
+
+            <!-- STEP 7: Mobile Capabilities -->
+            <div style="background: var(--bg-surface); border: 1px solid var(--bg-border); border-radius: 8px; padding: 1.5rem;">
+                <h2 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; color: var(--accent-primary);">STEP 7: Mobile Capabilities</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
+                    <div><label class="field-label">BLE Advertising Config</label><select name="ble_advertising" class="field-input">{% for opt in dropdowns.ble_advertising %}<option value="{{ opt }}">{{ opt }}</option>{% endfor %}</select></div>
+                    <div><label class="field-label">BLE Functionality</label><select name="ble_functionality" class="field-input">{% for opt in dropdowns.ble_functionality %}<option value="{{ opt }}">{{ opt }}</option>{% endfor %}</select></div>
+                    <div><label class="field-label">NFC Functionality</label><select name="nfc_enabled" class="field-input">{% for opt in dropdowns.enabled_disabled %}<option value="{{ opt }}">{{ opt }}</option>{% endfor %}</select></div>
+                    <div><label class="field-label">Mobile Keyset</label><select name="mobile_keyset" class="field-input">{% for opt in dropdowns.mobile_keysets %}<option value="{{ opt }}">{{ opt }}</option>{% endfor %}</select></div>
+                    <div><label class="field-label">Legacy Credentials (Sym Blue, Brivo)</label><select name="legacy_credentials" class="field-input">{% for opt in dropdowns.on_off %}<option value="{{ opt }}">{{ opt }}</option>{% endfor %}</select></div>
+                    <div><label class="field-label">Transport Mode</label><select name="transport_mode" class="field-input">{% for opt in dropdowns.on_off %}<option value="{{ opt }}">{{ opt }}</option>{% endfor %}</select></div>
+                    <div><label class="field-label">ECP DESFire</label><select name="ecp_desfire_enabled" class="field-input">{% for opt in dropdowns.enabled_disabled %}<option value="{{ opt }}">{{ opt }}</option>{% endfor %}</select></div>
+                    <div><label class="field-label">ECP TCI</label><input type="text" name="ecp_tci" placeholder="e.g. 02098f" class="field-input"></div>
+                    <div><label class="field-label">Apple Meridian Bit Count</label><select name="apple_meridian_bit_count" class="field-input">{% for opt in dropdowns.meridian_bit_counts %}<option value="{{ opt }}">{{ opt }}</option>{% endfor %}</select></div>
+                    <div><label class="field-label">MiFare2Go</label><select name="mifare2go_enabled" class="field-input">{% for opt in dropdowns.enabled_disabled %}<option value="{{ opt }}">{{ opt }}</option>{% endfor %}</select></div>
+                    <div style="grid-column: 1 / -1;"><label class="field-label">MiFare2Go DFNAME</label><input type="text" name="mifare2go_dfname" placeholder="e.g. A00000039656434103F532F00002098f" class="field-input"></div>
+                </div>
+            </div>
+
+            <!-- Form Submit Action -->
+            <div style="text-align: right; margin-top: 1rem;">
+                <button type="submit" style="background: var(--accent-primary); color: white; padding: 0.75rem 1.75rem; border: none; border-radius: 6px; font-weight: 600; font-size: 0.95rem; cursor: pointer;">
+                    Create Configuration CSV
+                </button>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+<!-- Component Styles -->
+<style>
+.field-label { display: block; font-size: 0.825rem; color: var(--text-muted); margin-bottom: 0.35rem; font-weight: 500; }
+.field-input { width: 100%; padding: 0.6rem; background: var(--bg-primary); border: 1px solid var(--bg-border); color: var(--text-main); border-radius: 6px; outline: none; font-size: 0.9rem; }
+</style>
+{% endblock %}

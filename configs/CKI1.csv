@@ -1,0 +1,67 @@
+Ketchikan Indian Community,,,,,,
+End User Configuration Form,,,,,Card Details,
+Config Name,CKI1,,,,Card Type,50H4
+Config ID,46,,,,
+STEP 1: Hardware,,,,,Bitstream,W56-0
+Wiegand/OSDP,ET10,ET20,ET25,,Facility Code,N/A
+-2WS,No,No,No,,Starting Badge,2000
+-3WS,No,No,No,,Notes,
+-6WS,Yes,Yes,Yes,,"Current credentials are EV1 cards reading 56 bit CSN
+
+Send sample cards to verify new format works on system and CSN report correctly from all readers.",
+-7WS,No,No,No,,,
+,,,,,,
+F2F,ET10,ET20,ET25,,,
+-7FM,No,No,No,,Part Numbers,
+,,,,,50H4-Lk10033,
+MCLP,ET10,ET20,ET25,,,
+-7FM,No,No,No,,,
+,,,,,Notes/Other Products,
+STEP 2: AV + Output Formats,,,,,"Interested in MyPass mobile app.
+
+TRANSITION STRATEGY: KIA should disable all CSN's once all credentials are LEAF EV2 cards. This would eliminate any unencrypted threat.",
+Wiegand/OSDP,,,,,,
+Idle LED,,Red,,,,
+Credential Report LED,,Green,,,,
+Beeper,,On,,,,
+Keypad Format,,8-bit,,,,
+Tamper Monitoring,,On,,,,
+F2F,,,,,,
+Casi Output Format,,CASI-4002,,,,
+Supervision State,,2-State,,,,
+Tamper Monitoring,,On,,,,
+STEP 3: HF,,,,,,
+Leaf Application,,Leaf CC,,,,
+Other Custom HF Application,,None,,,,
+"Custom
+Application
+Notes",Lk10033,,,,,
+,,,,,,
+,,,,,,
+STEP 4: CSN,,,,,,
+MFC CSN,,On,,,,
+EV1/EV2 CSN,,On,,,,
+iClass CSN,,On,,,,
+ISO15693 CSN,,On,,,,
+ISO14443A CSN,,On,,,,
+STEP 5: LF,,,,,,
+FSK Prox,,On,,,,
+ASK Prox,,On,,,,
+Prox Filter,,,,,,
+Prox Filter,,Off,,,,
+"Prox
+Filter
+Description",,,,,,
+,,,,,,
+,,,,,,
+STEP 6: Mobile,,,,,,
+BLE Advertising Config,,WaveLynx,,,,
+BLE Functionality,,Admin + MyPass,,,,
+NFC Functionality,,MyPass,,,,
+Mobile Keyset,,WaveLynx Transport,,,,
+Legacy Credentials (Symmetry Blue),,Off,,,,
+Transport Mode,,On,,,,
+Mobile Notes,,,,,,
+STEP 7: Part Numbers,,,,,,
+"Assigned 
+Part Numbers",ETXX-6WS-CKI1-Lk10033,,,,,

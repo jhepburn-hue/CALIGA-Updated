@@ -1,0 +1,199 @@
+<!-- Batch Wallet Pass Generator Template -->
+{% extends 'base.html' %}
+{% block title %}Batch Wallet Pass Generator | Caliga{% endblock %}
+
+{% block content %}
+<div style="padding: 1rem 0;">
+    <!-- Navigation Link -->
+    <a href="/tools" style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem;">← Back to Tools Hub</a>
+    
+    <!-- Page Header -->
+    <div style="margin: 1rem 0 1.5rem 0;">
+        <h1 style="font-size: 1.75rem; font-weight: 700; margin: 0;">Batch Wallet Pass Generator</h1>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0.35rem;">
+            Bulk issue Apple & Google Wallet pass links and QR codes across multiple configuration profiles via Erebus Relay.
+        </p>
+    </div>
+
+    <!-- Main Workspace Split -->
+    <div style="display: grid; grid-template-columns: 360px 1fr; gap: 1.5rem; align-items: start;">
+        
+        <!-- Selection Sidebar -->
+        <div style="background: var(--bg-surface); border: 1px solid var(--bg-border); border-radius: 8px; padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem;">
+            
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2 style="font-size: 1rem; font-weight: 600; margin: 0;">Select Configurations</h2>
+                <div style="font-size: 0.8rem; display: flex; gap: 0.5rem;">
+                    <a href="#" onclick="selectAllConfigs(true)" style="color: var(--accent-primary); text-decoration: none;">Select All</a>
+                    <span style="color: var(--text-muted);">|</span>
+                    <a href="#" onclick="selectAllConfigs(false)" style="color: var(--text-muted); text-decoration: none;">Clear</a>
+                </div>
+            </div>
+
+            <!-- Target Environment Selection -->
+            <div>
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-main); margin-bottom: 0.35rem;">
+                    Target Environment:
+                </label>
+                <select id="targetEnvSelect" style="width: 100%; background: var(--bg-primary); border: 1px solid var(--bg-border); color: var(--text-main); padding: 0.55rem; border-radius: 6px; font-size: 0.875rem;">
+                    <option value="staging" selected>Staging</option>
+                    <option value="production">Production</option>
+                </select>
+            </div>
+
+            <!-- Configuration Checkbox List -->
+            <div style="max-height: 380px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.4rem; padding-right: 0.25rem;">
+                {% for config in configs %}
+                <label style="display: flex; align-items: center; gap: 0.65rem; font-size: 0.875rem; background: var(--bg-primary); padding: 0.5rem 0.75rem; border-radius: 6px; border: 1px solid var(--bg-border); cursor: pointer;">
+                    <input type="checkbox" class="config-checkbox" value="{{ config.filename }}" {% if loop.index <= 3 %}checked{% endif %}>
+                    <span><strong>{{ config.config_name }}</strong> <span style="color: var(--text-muted); font-size: 0.8rem;">({{ config.keyset_id }})</span></span>
+                </label>
+                {% else %}
+                <div style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 1rem 0;">
+                    No configurations found with assigned LK numbers.
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Execution Action Button -->
+            <button id="batchWalletBtn" onclick="runBatchWallets()" style="width: 100%; background: var(--accent-primary); color: white; border: none; padding: 0.75rem; border-radius: 6px; font-weight: 600; font-size: 0.9rem; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
+                <span id="batchWalletSpinner" class="spinner-border d-none"></span>
+                <span id="batchWalletBtnText">Generate Wallet Passes</span>
+            </button>
+        </div>
+
+        <!-- Wallet Pass Results Stream -->
+        <div style="background: var(--bg-surface); border: 1px solid var(--bg-border); border-radius: 8px; padding: 1.25rem; min-height: 520px; display: flex; flex-direction: column; gap: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--bg-border); padding-bottom: 0.75rem;">
+                <h2 style="font-size: 1rem; font-weight: 600; margin: 0;">Issued Wallet Pass Stream</h2>
+                <span style="font-size: 0.85rem; color: var(--text-muted);" id="resultsCounter">0 Passes Issued</span>
+            </div>
+
+            <div id="resultsContainer" style="display: flex; flex-direction: column; gap: 1rem;">
+                <div style="color: var(--text-muted); font-size: 0.875rem; text-align: center; padding: 5rem 0;">
+                    Select configurations on the left and click <strong>Generate Wallet Passes</strong> to issue bulk links and QR codes.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Component Styles -->
+<style>
+.spinner-border {
+    width: 0.85rem;
+    height: 0.85rem;
+    border: 0.15em solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: spinner-border 0.75s linear infinite;
+}
+@keyframes spinner-border {
+    100% { transform: rotate(360deg); }
+}
+.d-none { display: none !important; }
+</style>
+
+<!-- Component Controller Scripts -->
+<script>
+function selectAllConfigs(state) {
+    document.querySelectorAll('.config-checkbox').forEach(cb => cb.checked = state);
+}
+
+function runBatchWallets() {
+    const selectedConfigs = Array.from(document.querySelectorAll('.config-checkbox:checked')).map(cb => cb.value);
+    const targetEnv = document.getElementById("targetEnvSelect").value;
+
+    if (selectedConfigs.length === 0) {
+        alert("Please select at least one configuration profile.");
+        return;
+    }
+
+    const btn = document.getElementById("batchWalletBtn");
+    const spinner = document.getElementById("batchWalletSpinner");
+    const btnText = document.getElementById("batchWalletBtnText");
+    const resultsContainer = document.getElementById("resultsContainer");
+
+    btn.disabled = true;
+    spinner.classList.remove("d-none");
+    btnText.innerText = " Processing Batch...";
+
+    resultsContainer.innerHTML = `
+        <div style="color: var(--text-muted); font-size: 0.9rem; text-align: center; padding: 4rem 0;">
+            Resolving group IDs and requesting Wallet Passes for ${selectedConfigs.length} configuration(s) in ${targetEnv.toUpperCase()}...
+        </div>
+    `;
+
+    fetch('/tools/api/generate-batch-wallets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            environment: targetEnv,
+            configs: selectedConfigs
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        btn.disabled = false;
+        spinner.classList.add("d-none");
+        btnText.innerText = "Generate Wallet Passes";
+
+        if (data.success && data.results) {
+            const successCount = data.results.filter(r => r.success).length;
+            document.getElementById("resultsCounter").innerText = `${successCount}/${data.results.length} Passes Issued (${targetEnv.toUpperCase()})`;
+            renderResults(data.results, targetEnv);
+        } else {
+            resultsContainer.innerHTML = `<div style="color: #f87171; padding: 1rem; background: rgba(239, 68, 68, 0.1); border-radius: 6px;">Error: ${data.error}</div>`;
+        }
+    })
+    .catch(() => {
+        btn.disabled = false;
+        spinner.classList.add("d-none");
+        btnText.innerText = "Generate Wallet Passes";
+        resultsContainer.innerHTML = `<div style="color: #f87171; padding: 1rem; background: rgba(239, 68, 68, 0.1); border-radius: 6px;">Network error during batch pass generation.</div>`;
+    });
+}
+
+function renderResults(results, envType) {
+    const container = document.getElementById("resultsContainer");
+    container.innerHTML = results.map(r => {
+        if (!r.success) {
+            return `
+                <div style="background: var(--bg-primary); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; padding: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <strong style="color: #f87171; font-size: 1rem;">${r.config_name}</strong>
+                        <span style="font-size: 0.8rem; color: var(--text-muted); font-family: monospace;">${r.keyset_id}</span>
+                    </div>
+                    <div style="color: #f87171; font-size: 0.85rem; margin-top: 0.35rem;">Generation Error: ${r.error}</div>
+                </div>
+            `;
+        }
+
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(r.wallet_url)}`;
+
+        return `
+            <div style="background: var(--bg-primary); border: 1px solid var(--bg-border); border-radius: 8px; padding: 1.1rem; display: flex; gap: 1.25rem; align-items: center;">
+                <div style="flex-shrink: 0; background: white; padding: 6px; border-radius: 6px; border: 1px solid var(--bg-border);">
+                    <img src="${qrUrl}" alt="Wallet QR Code" style="width: 110px; height: 150px; display: block; object-fit: contain;" />
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 0.4rem; flex: 1; min-width: 0;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <strong style="color: var(--accent-primary); font-size: 1.1rem;">${r.config_name}</strong>
+                        <span style="font-size: 0.75rem; background: rgba(16, 185, 129, 0.15); color: #10b981; padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: 600;">ISSUED (${envType.toUpperCase()})</span>
+                    </div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">
+                        Keyset ID: <strong style="color: var(--text-main); font-family: monospace;">${r.keyset_id}</strong> | Group ID: <strong style="color: var(--text-main); font-family: monospace;">${r.group_id}</strong>
+                    </div>
+                    <div style="margin-top: 0.25rem;">
+                        <div style="font-size: 0.775rem; color: var(--text-muted); font-weight: 600;">Pass Link:</div>
+                        <div style="font-family: monospace; background: var(--bg-surface); padding: 0.4rem 0.65rem; border-radius: 4px; border: 1px solid var(--bg-border); font-size: 0.8rem; word-break: break-all; margin-top: 0.2rem;">
+                            <a href="${r.wallet_url}" target="_blank" style="color: var(--accent-primary); text-decoration: none;">${r.wallet_url}</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+</script>
+{% endblock %}

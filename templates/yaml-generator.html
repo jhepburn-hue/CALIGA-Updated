@@ -1,0 +1,216 @@
+<!-- SAM YAML Generator Template -->
+{% extends 'base.html' %}
+{% block title %}SAM YAML Generator | Caliga{% endblock %}
+
+{% block content %}
+<div style="padding: 1rem 0; max-width: 860px; margin: 0 auto;">
+    <!-- Navigation Link -->
+    <a href="/tools" style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem;">← Back to Tools Hub</a>
+
+    <!-- Page Header -->
+    <div style="margin: 1rem 0 1.5rem 0;">
+        <h1 style="font-size: 1.75rem; font-weight: 700; margin: 0;">SAM YAML Generator</h1>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0.35rem;">
+            Generate SAM chip configuration YAML files for card cryptographic key storage.
+        </p>
+    </div>
+
+    <!-- Generator Input Form -->
+    <form id="yamlForm" action="/tools/yaml" method="POST" style="background: var(--bg-surface); border: 1px solid var(--bg-border); border-radius: 8px; padding: 2rem; display: flex; flex-direction: column; gap: 1.25rem;">
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem;">
+            <!-- SAM Type -->
+            <div>
+                <label class="form-label">SAM Type</label>
+                <select name="sam_type_choice" required class="form-input">
+                    <option value="" disabled selected hidden>-- Select SAM Type --</option>
+                    <option value="sam_av2">SAM AV2</option>
+                    <option value="sam_av3">SAM AV3</option>
+                </select>
+            </div>
+
+            <!-- Partner -->
+            <div>
+                <label class="form-label">Partner</label>
+                <select name="partner_choice" required class="form-input">
+                    <option value="" disabled selected hidden>-- Select Partner --</option>
+                    <option value="elatec">Elatec</option>
+                    <option value="rfideas">RFIdeas</option>
+                    <option value="brivo">Brivo</option>
+                    <option value="test">Test</option>
+                </select>
+            </div>
+
+            <!-- Partner Km Number -->
+            <div>
+                <label class="form-label">Partner Km Number</label>
+                <select name="partner_km_choice" required class="form-input">
+                    <option value="" disabled selected hidden>-- Select Km Number --</option>
+                    <option value="elatec">Elatec</option>
+                    <option value="rfideas">RFIdeas</option>
+                    <option value="brivo">Brivo</option>
+                    <option value="pdq">PDQ</option>
+                    <option value="test">Test</option>
+                </select>
+            </div>
+
+            <!-- OEM SKU -->
+            <div>
+                <label class="form-label">OEM SKU</label>
+                <input type="text" name="oem" required placeholder="e.g. PDK" class="form-input">
+            </div>
+        </div>
+
+        <!-- Keyset Options Section -->
+        <div style="border-top: 1px solid var(--bg-border); padding-top: 1.25rem; display: flex; flex-direction: column; gap: 1rem;">
+            <label style="display: flex; align-items: center; gap: 0.65rem; font-size: 0.9rem; cursor: pointer;">
+                <input type="checkbox" name="leaf_si_choice" value="true">
+                <span>Include Leaf Si Keyset</span>
+            </label>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem;">
+                <div>
+                    <label class="form-label">Leaf Cc Keyset</label>
+                    <input type="text" name="leaf_cc_choice" required placeholder="e.g. Lk50003" class="form-input">
+                </div>
+                <div>
+                    <label class="form-label">Secondary Leaf Cc Keyset (Optional)</label>
+                    <input type="text" name="second_leaf_cc_choice" placeholder="None" class="form-input">
+                </div>
+            </div>
+        </div>
+
+        <!-- Specialty Keys Toggle & Subfields -->
+        <div style="border-top: 1px solid var(--bg-border); padding-top: 1.25rem;">
+            <label style="display: flex; align-items: center; gap: 0.65rem; font-size: 0.9rem; cursor: pointer; margin-bottom: 1rem;">
+                <input type="checkbox" id="specialty_keys" name="specialty_keys_choice" value="true">
+                <span>Include Specialty Keys Configuration</span>
+            </label>
+
+            <div id="specialty-fields" style="display: none !important; background: var(--bg-primary); border: 1px solid var(--bg-border); padding: 1.25rem; border-radius: 6px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                <div>
+                    <label class="form-label">Key Slot</label>
+                    <input type="number" id="key_slot" name="key_slot" placeholder="64" class="form-input">
+                </div>
+                <div>
+                    <label class="form-label">Key Version (0-2)</label>
+                    <input type="number" id="key_version" name="key_version" min="0" max="2" placeholder="0" class="form-input">
+                </div>
+                <div>
+                    <label class="form-label">Key Type</label>
+                    <select id="key_type" name="key_type_choice" class="form-input">
+                        <option value="aes_128">AES-128 Key</option>
+                        <option value="mifare">MIFARE Key</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label">Key Use</label>
+                    <select id="key_use" name="key_use_choice" class="form-input">
+                        <option value="picc">PICC Key</option>
+                        <option value="offline_crypto">Offline Crypto Key</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- ECP & Terminal Section -->
+        <div style="border-top: 1px solid var(--bg-border); padding-top: 1.25rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem;">
+            <div>
+                <label class="form-label">TCI Code (6 Hex Digits)</label>
+                <input type="text" name="tci_choice" required placeholder="e.g. 0209FE" class="form-input">
+            </div>
+            <div>
+                <label class="form-label">ECP Terminal Info Mode</label>
+                <select name="ecp_terminal_choice" required class="form-input">
+                    <option value="tra_express">TRA Express (0xC3)</option>
+                    <option value="tra_enabled">TRA Enabled (0x83)</option>
+                </select>
+            </div>
+            <div>
+                <label class="form-label">ECP Terminal Subtype</label>
+                <select name="ecp_terminal_subtype_choice" required class="form-input">
+                    <option value="corporate">Corporate (2)</option>
+                    <option value="university">University (0)</option>
+                    <option value="hospitality">Hospitality (3)</option>
+                    <option value="residential">Residential (4)</option>
+                </select>
+            </div>
+            <div>
+                <label class="form-label">ECP Bit Count</label>
+                <input type="number" name="ecp_bit_count_choice" value="40" min="0" class="form-input">
+            </div>
+            <div>
+                <label class="form-label">ECP App</label>
+                <select name="ecp_app_choice" required class="form-input">
+                    <option value="credential_app">Credential App</option>
+                    <option value="secure_app">Secure App</option>
+                </select>
+            </div>
+            <div>
+                <label class="form-label">MiFare 2Go Application ID</label>
+                <select name="mifare_2go_app_id_choice" required class="form-input">
+                    <option value="leaf">Leaf (F5 1C DF)</option>
+                    <option value="generic">Generic (F5 32 F0)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Form Submission Buttons -->
+        <div style="border-top: 1px solid var(--bg-border); padding-top: 1.25rem; display: flex; justify-content: flex-end; gap: 0.75rem;">
+            <button type="reset" id="reset_btn" style="background: var(--bg-primary); border: 1px solid var(--bg-border); color: var(--text-main); padding: 0.75rem 1.5rem; border-radius: 6px; font-weight: 500; cursor: pointer;">Reset Form</button>
+            <button type="submit" style="background: var(--accent-primary); color: white; border: none; padding: 0.75rem 1.75rem; border-radius: 6px; font-weight: 600; cursor: pointer;">Generate & Download YAML</button>
+        </div>
+
+    </form>
+</div>
+
+<!-- Component Input Styles -->
+<style>
+.form-label {
+    display: block;
+    font-size: 0.825rem;
+    color: var(--text-muted);
+    margin-bottom: 0.35rem;
+    font-weight: 600;
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.65rem;
+    background: var(--bg-primary);
+    border: 1px solid var(--bg-border);
+    color: var(--text-main);
+    border-radius: 6px;
+    outline: none;
+    font-size: 0.9rem;
+}
+</style>
+
+<!-- Component Controller Script -->
+<script>
+const specialtyCheckbox = document.getElementById('specialty_keys');
+const specialtyContainer = document.getElementById('specialty-fields');
+const specialtyInputs = specialtyContainer.querySelectorAll('input, select');
+const form = document.getElementById('yamlForm');
+
+specialtyCheckbox.addEventListener('change', function() {
+    if (this.checked) {
+        specialtyContainer.style.setProperty('display', 'grid', 'important');
+        specialtyInputs.forEach(i => i.required = true);
+    } else {
+        specialtyContainer.style.setProperty('display', 'none', 'important');
+        specialtyInputs.forEach(i => {
+            i.required = false;
+            i.value = "";
+        });
+    }
+});
+
+form.addEventListener('reset', function() {
+    specialtyContainer.style.setProperty('display', 'none', 'important');
+    specialtyInputs.forEach(i => {
+        i.required = false;
+    });
+});
+</script>
+{% endblock %}

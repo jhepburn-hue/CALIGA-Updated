@@ -1,0 +1,75 @@
+RANDSTAD (For Acre),,,,,
+End User Configuration Form,,,,,Card Details
+Config Name,CRAN1,,,,Card Type
+Config ID,326,,,,Bitstream
+STEP 1: Hardware,,,,,Facility Code
+Wiegand/OSDP,ET10,ET20,ET25,,Starting Badge
+-2WS,No,No,No,,Notes
+-3WS,No,No,No,,
+-6WS,Yes,Yes,Yes,,
+-7WS,Yes,Yes,Yes,,
+,,,,,
+F2F,ET10,ET20,ET25,,Part Numbers
+-7FM,No,No,No,,
+,,,,,
+MCLP,ET10,ET20,ET25,,
+-7FM,No,No,No,,Notes/Other Products
+,,,,,"Custom configuration with RANDSTAD's IDWARE card
+
+Customer will be using Acre One mobile app (myPass) and their custom cards "
+STEP 2: Custom Keyset,,,,,
+Custom Keyset (LEAF Cc),,Disabled,,,
+Keyset ID (LkXXXXX),,,,,
+LEAF Customer Code (Decimal),,,,,
+STEP 3: AV + Output Formats,,,,,
+Wiegand/OSDP,,,,,
+Idle LED,,Red,,,
+Credential Report LED,,Green,,,
+Beeper,,On,,,
+Keypad Format,,4-bit,,,
+Tamper Monitoring,,On,,,
+F2F,,,,,
+Casi Output Format,,CASI-4002,,,
+Supervision State,,2-State,,,
+Tamper Monitoring,,On,,,
+STEP 4: High Frequency (HF),,,,,
+Leaf Si Application (Kv1),,None,,,
+Leaf Cc Application (Kc1),,None,,,
+Other Custom HF Application,,Custom EV1,,,
+"Custom
+Application
+Notes",- RANDSTAD IDWARE card,,,,
+,,,,,
+,,,,,
+STEP 5: Card Serial Number (CSN),,,,,
+MFC CSN,,Off,Standard,,
+EV1/EV2 CSN,,Off,Standard,,
+iClass CSN,,Off,Standard,,
+ISO15693 CSN,,Off,Standard,,
+ISO14443A CSN,,Off,,,
+STEP 6: Low Frequency (LF),,,,,
+FSK Prox,,On,,,
+ASK Prox,,On,,,
+Prox Filter,,,,,
+Prox Filter,,Off,,,
+"Prox
+Filter
+Description",,,,,
+,,,,,
+,,,,,
+STEP 7: Mobile,,,,,
+BLE Advertising Config,,WaveLynx (ETHS),,,
+BLE Functionality,,Admin + Credentials,,,
+NFC Functionality,,Enabled,,,
+Mobile Keyset,,WaveLynx Transport,,,
+"Legacy Credentials (Sym Blue, Brivo)",,Off,,,
+Transport Mode,,On,,,
+ECP DESFire,,Disabled,,,
+ECP TCI,,1,,,
+Apple Meridian Bit Count,,1,,,
+MiFare2Go,,Disabled,,,
+MiFare2Go DFNAME,,1,,,
+Mobile Notes,,,,,
+STEP 8: Part Numbers,,,,,
+"Assigned 
+Part Numbers",,,,,

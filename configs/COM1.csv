@@ -1,0 +1,73 @@
+State of Oklahoma,,,,,,
+End User Configuration Form,,,,,Card Details,
+Config Name,COM1-Lk10063,,,,Card Type,50D8
+Config ID,75,,,,
+STEP 1: Hardware,,,,,Bitstream,W36-2
+Wiegand/OSDP,ET10,ET20,ET25,,Facility Code,460
+-2WS,No,No,No,,Starting Badge,1900
+-3WS,No,No,No,,Notes,
+-6WS,No,No,No,,,
+-7WS,Yes,Yes,Yes,,,
+,,,,,,
+F2F,ET10,ET20,ET25,,,
+-7FM,No,No,No,,Part Numbers,
+,,,,,50D8-Lk10063,
+MCLP,ET10,ET20,ET25,,,
+-7FM,No,No,No,,,
+,,,,,Notes/Other Products,
+STEP 2: Custom Keyset,,,,,Symmetry label,
+Custom Keyset,,Enabled,,,,
+Keyset ID,,Lk10063,,,,
+LEAF Customer Code (Decimal),,,,,,
+STEP 3: AV + Output Formats,,,,,,
+Wiegand/OSDP,,,,,,
+Idle LED,,Off,,,,
+Credential Report LED,,Green,,,,
+Beeper,,On,,,,
+Keypad Format,,8-bit,,,,
+Tamper Monitoring,,On,,,,
+F2F,,,,,,
+Casi Output Format,,CASI-4002,,,,
+Supervision State,,2-State,,,,
+Tamper Monitoring,,On,,,,
+STEP 4: High Frequency (HF),,,,,,
+Leaf Application,,Leaf CC,,,,
+Other Custom HF Application,,None,,,,
+"Custom
+Application
+Notes",,,,,,
+,,,,,,
+,,,,,,
+STEP 5: Card Serial Number (CSN),,,,,,
+MFC CSN,,Off,,,,
+EV1/EV2 CSN,,Off,,,,
+iClass CSN,,Off,,,,
+ISO15693 CSN,,Off,,,,
+ISO14443A CSN,,Off,,,,
+STEP 6: Low Frequency (LF),,,,,,
+FSK Prox,,On,,,,
+ASK Prox,,On,,,,
+Prox Filter,,,,,,
+Prox Filter,,On,,,,
+"Prox
+Filter
+Description",Ignore all W36-2 cards with FC = 460,,,,,
+,,,,,,
+,,,,,,
+STEP 7: Mobile,,,,,,
+BLE Advertising Config,,AMAG (AMAG),,,,
+BLE Functionality,,Admin + Credentials,,,,
+NFC Functionality,,Disabled,,,,
+Mobile Keyset,,AMAG Transport,,,,
+"Legacy Credentials (Sym Blue, Brivo)",,Off,,,,
+Transport Mode,,Off,,,,
+ECP DESFire,,Disabled,,,,
+ECP TCI,,,,,,
+Mobile Notes,"Want Symmetry Mobile (Jeff pass's 'ZEROES' key)
+
+Do not want Symmetry Blue",,,,,
+STEP 8: Part Numbers,,,,,,
+"Assigned 
+Part Numbers","ETxx-#WS-LAM-COM1-Lk10063
+
+Reader Label CPN - AMAG PN: 9X9S-COM1-LK10063",,,,,

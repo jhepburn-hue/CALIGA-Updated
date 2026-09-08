@@ -1,0 +1,79 @@
+{
+    "devices": {
+        "et02": {
+            "port": "ttyAMA1",
+            "baud": 115200,
+            "address": 1
+        },
+        "chimera": {
+            "port": "ttyUSB0",
+            "baud": 115200,
+            "address": 1
+        },
+        "ax2x": {
+            "port": "ttyUSB1",
+            "baud": 9600,
+            "address": 1
+        },
+        "lock": {
+            "port": "ttyUSB1",
+            "baud": 115200,
+            "address": 1
+        },
+        "reader": {
+            "port": "ttyUSB0",
+            "baud": 9600,
+            "address": 0
+        },
+        "reader1": {
+            "port": "ttyUSB1",
+            "baud": 9600,
+            "address": 0
+        },
+        "reader2": {
+            "port": "ttyUSB2",
+            "baud": 9600,
+            "address": 0
+        },
+        "reader3": {
+            "port": "ttyUSB3",
+            "baud": 9600,
+            "address": 0
+        },
+        "reader4": {
+            "port": "ttyUSB4",
+            "baud": 9600,
+            "address": 0
+        },
+        "reader5": {
+            "port": "ttyUSB5",
+            "baud": 9600,
+            "address": 0
+        },
+        "secureReader0": {
+            "port": "ttyUSB0",
+            "baud": 9600,
+            "address": 0,
+            "secure": true,
+            "scbk": "303132333435363738393A3B3C3D3E3F"
+        }
+        // Example configuration with all parameters:
+        /*
+        "example": {
+            "port": "ttyUSB0",
+            "baud_rate": 115200,
+            "verbose": true,
+            "ibeacon": true,
+            "file": "/path/to/file",
+            "poll": true,
+            "serial": "0102030405060708",
+            "secure": true,
+            "scbk": "303132333435363738393A3B3C3D3E3F",
+            "flush_log": true,
+            "repl": true,
+            "command": "id",
+            "list_commands": true
+        }
+        */
+    }
+}

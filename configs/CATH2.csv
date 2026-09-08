@@ -1,0 +1,81 @@
+Anthropic,,,,,
+End User Configuration Form,,,,,
+Config Name,CATH2,,,,Notes/Other Products
+Config ID,194,,,,"New Anthropic configuration using standard plastics and wallet. Anthropic might move away from Brivo.
+
+Card Information:
+50D8
+W26-0
+Starting BID: 21,200
+FC: 142
+
+"
+STEP 1: Hardware,,,,,
+Wiegand/OSDP,ET10,ET20,ET25,,
+-2WS,No,No,No,,
+-3WS,No,No,No,,
+-6WS,Yes,Yes,Yes,,
+-7WS,Yes,Yes,Yes,,
+,,,,,
+F2F,ET10,ET20,ET25,,
+-7FM,No,No,No,,
+,,,,,
+MCLP,ET10,ET20,ET25,,
+-7FM,No,No,No,,
+,,,,,
+STEP 2: Custom Keyset,,,,,
+Custom Keyset (LEAF Cc),,Enabled,,,
+Keyset ID (LkXXXXX),,Lk10078,,,
+LEAF Customer Code (Decimal),,106,,,
+STEP 3: AV + Output Formats,,,,,
+Wiegand/OSDP,,,,,
+Idle LED,,Red,,,
+Credential Report LED,,Green,,,
+Beeper,,On,,,
+Keypad Format,,8-bit,,,
+Tamper Monitoring,,On,,,
+F2F,,,,,
+Casi Output Format,,CASI-4002,,,
+Supervision State,,2-State,,,
+Tamper Monitoring,,On,,,
+STEP 4: High Frequency (HF),,,,,
+Leaf Si Application (Kv1),,None,,,
+Leaf Cc Application (Kc1),,Leaf Cc,,,
+Other Custom HF Application,,None,,,
+"Custom
+Application
+Notes",,,,,
+,,,,,
+,,,,,
+STEP 5: Card Serial Number (CSN),,,,,
+MFC CSN,,Off,CSN_32_BIT_MSB,,
+EV1/EV2 CSN,,Off,CSN_32_BIT_MSB,,
+iClass CSN,,Off,CSN_32_BIT_MSB,,
+ISO15693 CSN,,Off,CSN_32_BIT_MSB,,
+ISO14443A CSN,,Off,,,
+STEP 6: Low Frequency (LF),,,,,
+FSK Prox,,On,,,
+ASK Prox,,On,,,
+Prox Filter,,,,,
+Prox Filter,,Off,,,
+"Prox
+Filter
+Description",,,,,
+,,,,,
+,,,,,
+STEP 7: Mobile,,,,,
+BLE Advertising Config,,Unique (Differs),,,
+BLE Functionality,,Admin Only,,,
+NFC Functionality,,Enabled,,,
+Mobile Keyset,,Custom,,,
+"Legacy Credentials (Sym Blue, Brivo)",,Off,,,
+Transport Mode,,Off,,,
+ECP DESFire,,Enabled,,,
+ECP TCI,,02094f,,,
+Apple Meridian Bit Count,,40,,,
+MiFare2Go,,Enabled,,,
+MiFare2Go DFNAME,,A00000039656434103F532F00002094f,,,
+Mobile Notes,,,,,
+STEP 8: Part Numbers,,,,,
+"Assigned 
+Part Numbers",ETxx-xWS-CATH2-LK10078,,,,

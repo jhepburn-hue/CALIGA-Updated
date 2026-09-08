@@ -1,0 +1,354 @@
+<!-- Test Run Execution Template -->
+{% extends 'base.html' %}
+{% block title %}{{ test_case.config_name }} Test Run | Caliga{% endblock %}
+
+{% block content %}
+<div id="test-run-root" data-version="{{ test_case.version }}" data-session-id="{{ session_id }}" data-filename="{{ test_case.filename }}" data-failed="{% if test_case.status == 'FAIL' %}true{% else %}false{% endif %}" style="padding: 1rem 0; max-width: 960px; margin: 0 auto;">
+    <!-- Navigation Link -->
+    <a href="/testing/version/{{ test_case.version }}/session/{{ session_id }}" style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem;">  Back to Session Workspace</a>
+
+    <!-- Execution Header and Controls -->
+    <div style="background: var(--bg-surface); border: 1px solid var(--bg-border); border-radius: 8px; padding: 1.25rem 1.5rem; margin: 1rem 0 1.5rem 0; display: flex; flex-direction: column; gap: 1rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <h1 style="font-size: 1.6rem; font-weight: 700; margin: 0;">{{ test_case.config_name }} Verification</h1>
+                    <span style="font-family: monospace; background: var(--bg-primary); border: 1px solid var(--bg-border); color: var(--accent-primary); padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.85rem; font-weight: 600;">
+                        {{ test_case.version }}
+                    </span>
+                </div>
+                <p style="color: var(--text-muted); font-size: 0.875rem; margin: 0.35rem 0 0 0;">Perform step-by-step verification checks against hardware.</p>
+            </div>
+
+            <!-- OSDP Actions & Tester Selector -->
+            <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                <button id="flashBinBtn" class="action-btn" onclick="flashProfileBin()">
+                    <span id="flashBinSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    <span id="flashBinText">Flash Profile BIN</span>
+                </button>
+                <button id="flashFirmwareBtn" class="action-btn" onclick="flashFirmwareDck()">
+                    <span id="flashFirmwareSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    <span id="flashFirmwareText">Flash Firmware DCK</span>
+                </button>
+
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-left: 0.5rem;">
+                    <label style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;"><span style="color: #ef4444;">*</span> Tester Name:</label>
+                    <select id="assigneeSelect" onchange="updateAssignee(this.value)" style="background: var(--bg-primary); border: 1px solid var(--bg-border); color: var(--text-main); padding: 0.45rem 0.8rem; border-radius: 6px; font-size: 0.875rem;">
+                        {% for member in team_members %}
+                            <option value="{{ member }}" {% if member == test_case.assigned_to %}selected{% endif %}>{{ member }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- OSDP Port Picker -->
+                <div class="port-picker-container mb-3">
+                    <span class="port-picker-label">Serial / RS-485 Port:</span>
+                    <select id="osdp-port-select" class="port-select-dark">
+                        <option value="">Scanning ports...</option>
+                    </select>
+                    <button class="btn-port-refresh" type="button" onclick="loadOsdpPorts()" title="Refresh Ports">
+                        &#8635;
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Verification Test Cards Grid -->
+    <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+        {% for section in test_case.sections %}
+        <div style="background: var(--bg-surface); border: 1px solid var(--bg-border); border-radius: 8px; padding: 1.5rem;">
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+                <h2 style="font-size: 1.2rem; font-weight: 600; color: var(--text-main); margin: 0;">{{ section.title }}</h2>
+                
+                <div style="display: flex; gap: 0.5rem;">
+                    <button onclick="setSectionStatus('{{ section.section_id }}', 'PASS')" class="btn-check btn-pass {% if section.status == 'PASS' %}active{% endif %}">
+                        PASS
+                    </button>
+                    <button onclick="setSectionStatus('{{ section.section_id }}', 'FAIL')" class="btn-check btn-fail {% if section.status == 'FAIL' %}active{% endif %}">
+                        FAIL
+                    </button>
+                </div>
+            </div>
+
+            <!-- Verification Criteria List -->
+            <ul style="margin: 0; padding-left: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.95rem; color: var(--text-main); line-height: 1.5;">
+                {% for item in section.criteria %}
+                <li>{{ item.label }}: <strong>{{ item.value }}</strong></li>
+                {% endfor %}
+            </ul>
+
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Submission Section -->
+    <div style="background: var(--bg-surface); border: 1px solid var(--bg-border); border-radius: 8px; padding: 1.5rem; margin-top: 1.5rem; display: flex; flex-direction: column; gap: 1rem;">
+        <h2 style="font-size: 1.1rem; font-weight: 600; margin: 0;">Submit Test Run Results</h2>
+        
+        <!-- Failure Notes Input -->
+        {% if test_case.status == 'FAIL' %}
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <label style="font-size: 0.85rem; color: #f87171; font-weight: 600;"><span style="color: #ef4444;">*</span> Failure Reason / Comments Required:</label>
+            <input type="text" id="runNotes" placeholder="Required: Explain failure observations..." value="{{ test_case.notes }}" style="background: var(--bg-primary); border: 1px solid rgba(239, 68, 68, 0.4); color: var(--text-main); padding: 0.75rem 0.85rem; border-radius: 6px; font-size: 0.9rem; outline: none; width: 100%;">
+        </div>
+        {% else %}
+        <input type="hidden" id="runNotes" value="">
+        {% endif %}
+
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 0.85rem; color: var(--text-muted);">
+                {% if test_case.status == 'FAIL' %}
+                <strong style="color: #f87171;">Notice:</strong> Submitting will send an automated failure notification to Slack.
+                {% else %}
+                <strong style="color: #10b981;">Notice:</strong> All tests passing/untested. Click submit to log results.
+                {% endif %}
+            </span>
+
+            <button onclick="submitTestRun()" style="background: var(--accent-primary); color: #ffffff; border: none; padding: 0.75rem 1.75rem; border-radius: 6px; font-weight: 600; font-size: 0.95rem; cursor: pointer;">
+                Submit Results
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Component Styles -->
+<style>
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: var(--bg-primary);
+    border: 1px solid var(--bg-border);
+    color: var(--text-main);
+    padding: 0.45rem 0.85rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.825rem;
+    font-weight: 500;
+    transition: border-color 0.15s, color 0.15s;
+}
+
+.action-btn:hover {
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+}
+
+.btn-check {
+    padding: 0.4rem 1rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--bg-primary);
+    color: var(--text-main);
+    border: 1px solid var(--bg-border);
+}
+
+.btn-pass.active {
+    background: #10b981;
+    color: #ffffff;
+    border-color: #10b981;
+}
+
+.btn-fail.active {
+    background: #ef4444;
+    color: #ffffff;
+    border-color: #ef4444;
+}
+
+.d-none {
+    display: none !important;
+}
+
+.port-picker-container {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.port-picker-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #94a3b8;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.port-select-dark {
+    background-color: #0f172a;
+    border: 1px solid #334155;
+    color: #e2e8f0;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 0.875rem;
+    outline: none;
+    transition: border-color 0.2s;
+    min-width: 180px;
+}
+
+.port-select-dark:focus {
+    border-color: #38bdf8;
+}
+
+.btn-port-refresh {
+    background-color: #1e293b;
+    border: 1px solid #334155;
+    color: #94a3b8;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-port-refresh:hover {
+    background-color: #334155;
+    color: #f8fafc;
+}
+</style>
+
+<!-- Component Controller Script -->
+<script>
+const rootElem = document.getElementById("test-run-root");
+const VERSION = rootElem.dataset.version;
+const SESSION_ID = rootElem.dataset.sessionId;
+const FILENAME = rootElem.dataset.filename;
+const IS_FAILED = rootElem.dataset.failed === "true";
+
+function flashProfileBin() {
+    alert(`OSDP Profile Transfer for ${FILENAME} (${VERSION}) is deferred for future implementation.`);
+}
+
+function flashFirmwareDck() {
+    alert(`OSDP Firmware Transfer for ${FILENAME} (${VERSION}) is deferred for future implementation.`);
+}
+
+function setSectionStatus(sectionId, status) {
+    fetch('/testing/api/update-section', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            version: VERSION,
+            session_id: SESSION_ID,
+            filename: FILENAME,
+            section_id: sectionId,
+            status: status
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            window.location.reload();
+        }
+    });
+}
+
+function updateAssignee(assignee) {
+    fetch('/testing/api/update-assignee', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            version: VERSION,
+            session_id: SESSION_ID,
+            filename: FILENAME,
+            assigned_to: assignee
+        })
+    });
+}
+
+function submitTestRun() {
+    const assignee = document.getElementById("assigneeSelect").value;
+    const note = document.getElementById("runNotes").value.trim();
+
+    if (assignee === "Unassigned") {
+        alert("Please select a Tester Name before submitting the test run.");
+        return;
+    }
+
+    if (IS_FAILED && !note) {
+        alert("Failure comments are required before submitting a failed test run.");
+        return;
+    }
+
+    fetch('/testing/api/submit-run', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            version: VERSION,
+            session_id: SESSION_ID,
+            filename: FILENAME,
+            assigned_to: assignee,
+            note: note
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            if (data.slack_sent) {
+                alert("Test results submitted and Slack failure report dispatched!");
+            } else {
+                alert("Test results submitted successfully!");
+            }
+            window.location.href = data.redirect_url;
+        } else {
+            alert(data.error || "Failed to submit test run.");
+        }
+    });
+}
+
+async function loadOsdpPorts() {
+  const select = document.getElementById('osdp-port-select');
+  select.innerHTML = '<option value="">Scanning...</option>';
+  try {
+    const res = await fetch('/api/ports');
+    const data = await res.json();
+    select.innerHTML = '';
+    
+    if (!data.ports || data.ports.length === 0) {
+      select.innerHTML = '<option value="">No serial ports found</option>';
+      return;
+    }
+    
+    data.ports.forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = p.device;
+      opt.textContent = `${p.device} (${p.description})`;
+      select.appendChild(opt);
+    });
+  } catch (err) {
+    select.innerHTML = '<option value="">Failed to scan ports</option>';
+  }
+}
+
+async function triggerProfileFlash() {
+  const port = document.getElementById('osdp-port-select').value;
+  if (!port) return alert("Select a serial port first.");
+
+  const response = await fetch('/testing/flash-profile', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ port: port })
+  });
+  const data = await response.json();
+  alert(data.message || data.error);
+}
+
+async function triggerFirmwareFlash() {
+  const port = document.getElementById('osdp-port-select').value;
+  if (!port) return alert("Select a serial port first.");
+
+  const response = await fetch('/testing/flash-firmware', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ port: port })
+  });
+  const data = await response.json();
+  alert(data.message || data.error);
+}
+
+document.addEventListener('DOMContentLoaded', loadOsdpPorts);
+</script>
+{% endblock %}

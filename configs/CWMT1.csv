@@ -1,0 +1,61 @@
+Walmart,,,,,,
+End User Configuration Form,,,,,,Card Details
+Config Name,CWMT1,,,,,Credential Notes
+Config ID,303,,,,,Card Type
+STEP 1: Hardware,,,,,,Bitstream
+Wiegand/OSDP,AX10,AX15,AX20,AX25,,Facility Code
+Ascent,Yes,Yes,Yes,Yes,,Starting Badge
+Summit,No,No,No,No,,Notes/Other Products
+Module,No,,,,,"- Walmart DESFire cards should output little endian instead of big endian, opposite our normal. This is to match a problem with their previous reader supplier, but it is how their cards are enrolled in the PACS.
+- Legacy iClass support
+- LEAF Verified support
+- Credential read beep disabled"
+STEP 2: Custom Keyset,,,,,,
+Custom Keyset (LEAF Cc),,Enabled,,,,
+Keyset ID (LkXXXXX),,Lk10156,,,,
+STEP 3: AV + Output Formats,,,,,,
+Idle LED,,Red,,,,
+Credential Report LED,,Green,,,,
+STEP 4: High Frequency (HF),,,,,,
+Leaf Si Application (Kv1),,None,,,,
+Leaf Cc Application (Kc1),,Leaf Cc,,,,
+"Custom
+Application
+Notes",Kc1 of Lk10156 and Custom Walmart DESFire App,,,,,
+,,,,,,
+,,,,,,
+STEP 5: Card Serial Number (CSN),,,,,,
+MFC CSN,,Off,32-bit MSB,,,
+EV1/EV2 CSN,,Off,32-bit MSB,,,
+iClass CSN,,On,32-bit MSB,,,
+ISO15693 CSN,,Off,32-bit MSB,,,
+ISO14443A CSN,,Off,32-bit MSB,,,
+STEP 6: Low Frequency (LF),,,,,,
+FSK Prox,,On,,,,
+ASK Prox,,On,,,,
+Prox Filter,,,,,,
+Prox Filter,,Off,,,,
+"Prox
+Filter
+Description",,,,,,
+,,,,,,
+,,,,,,
+STEP 7: BLE,,,,,,
+BLE Advertising Name,,APEX,,,,
+BLE Admin,,Yes,,,,
+BLE Credentials,,No,,,,
+BLE Notes,,,,,,
+,,,,,,
+STEP 8: NFC,,,,,,
+NFC Functionality,,Wallet,,,,
+Mobile Keyset,,WaveLynx Transport ,,,,
+Transport Mode,,Off,,,,
+ECP DESFire (Apple Wallet),,Enabled,,,,
+ECP TCI,,02099d,,,,
+Apple Meridian Bit Count,,40,,,,
+MiFare2Go (Android Wallet),,Enabled,,,,
+Mobile Notes,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+ND 5/1/2026: Disable credential read beep,,,,,,

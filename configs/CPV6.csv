@@ -1,0 +1,89 @@
+Wavelynx 75-bit PIV w/ MFC/MFD Smartmax and SEIWG,,,,,
+End User Configuration Form,,,,,Card Details
+Config Name,CPV6,,,,Card Type
+Config ID,107,,,,Bitstream
+STEP 1: Hardware,,,,,Facility Code
+Wiegand/OSDP,ET10,ET20,ET25,,Starting Badge
+-2WS,Yes,Yes,Yes,,Notes
+-3WS,Yes,Yes,Yes,,
+-6WS,No,No,No,,
+-7WS,No,No,No,,
+,,,,,
+F2F,ET10,ET20,ET25,,Part Numbers
+-7FM,No,No,No,,
+,,,,,
+MCLP,ET10,ET20,ET25,,
+-7FM,No,No,No,,Notes/Other Products
+,,,,,"- Includes DESFire cards per Google's request 
+- MFC/MFD Smartmax support
+- 75 bit format: 
+OPT_AUG, FIPS_201_INDEX , 0x01
+- SEIWG support
+
+Same as CPV4 but with MFC/MFD Smartmax
+"
+STEP 2: Custom Keyset,,,,,
+Custom Keyset (LEAF Cc),,Disabled,,,
+Keyset ID (LkXXXXX),,,,,
+LEAF Customer Code (Decimal),,,,,
+STEP 3: AV + Output Formats,,,,,
+Wiegand/OSDP,,,,,
+Idle LED,,Red,,,
+Credential Report LED,,Green,,,
+Beeper,,On,,,
+Keypad Format,,8-bit,,,
+Tamper Monitoring,,On,,,
+F2F,,,,,
+Casi Output Format,,CASI-4002,,,
+Supervision State,,2-State,,,
+Tamper Monitoring,,On,,,
+STEP 4: High Frequency (HF),,,,,
+Leaf Si Application (Kv1),,None,,,
+Leaf Cc Application (Kc1),,None,,,
+Other Custom HF Application,,None,,,
+"Custom
+Application
+Notes","Reads PIV Card Types: 
+CT_ISO_14443A_4, CT_GENERIC_CL2, and 
+CT_MF_DESFIRE_EV1_2. 
+MFC/MFD Smartmax",,,,
+,,,,,
+,,,,,
+STEP 5: Card Serial Number (CSN),,,,,
+MFC CSN,,Off,Standard,,
+EV1/EV2 CSN,,Off,Standard,,
+iClass CSN,,Off,Standard,,
+ISO15693 CSN,,Off,Standard,,
+ISO14443A CSN,,Off,,,
+STEP 6: Low Frequency (LF),,,,,
+FSK Prox,,On,,,
+ASK Prox,,On,,,
+Prox Filter,,,,,
+Prox Filter,,Off,,,
+"Prox
+Filter
+Description",,,,,
+,,,,,
+,,,,,
+STEP 7: Mobile,,,,,
+BLE Advertising Config,,WaveLynx (ETHS),,,
+BLE Functionality,,Admin Only,,,
+NFC Functionality,,Disabled,,,
+Mobile Keyset,,WaveLynx Transport,,,
+"Legacy Credentials (Sym Blue, Brivo)",,Off,,,
+Transport Mode,,On,,,
+ECP DESFire,,Disabled,,,
+ECP TCI,,,,,
+Apple Meridian Bit Count,,,,,
+MiFare2Go,,Disabled,,,
+MiFare2Go DFNAME,,,,,
+Mobile Notes,,,,,
+STEP 8: Part Numbers,,,,,
+"Assigned 
+Part Numbers",,,,,
+,,,,,
+,,,,,
+,,,,,
+,,,,,
+,,,,,
+ND 6/14/24: Smartmax support also adds SEIWG support to the reader with FW 3.2.60.3,,,,,

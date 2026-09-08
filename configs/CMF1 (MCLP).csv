@@ -1,0 +1,89 @@
+MidFirst Bank,,,,,,
+End User Configuration Form,,,,,Card Details,
+Config Name,CMF1,,,,Card Type,Dual-Tech Prox/EV2
+Config ID,17,,,,Bitstream,W37-4
+STEP 1: Hardware,,,,,Facility Code,11
+Wiegand/OSDP,ET10,ET20,ET25,,Starting Badge,"1,100"
+-2WS,No,No,No,,Notes,
+-3WS,No,No,No,,,
+-6WS,No,No,No,,,
+-7WS,No,No,No,,,
+,,,,,,
+F2F,ET10,ET20,ET25,,Part Numbers,
+-7FM,No,No,No,,"50D8-Lk10016
+939M-KP-CMF1-LK10016
+939M-CMF1-LK10016
+929M-CMF1-LK10016",
+,,,,,,
+MCLP,ET10,ET20,ET25,,,
+-7FM,Yes,Yes,Yes,,Notes/Other Products,
+,,,,,"This configuration should be based off of the 
+default AMAG config as these will be installed 
+by AMAG.
+
+The BLE will advertise as AMAG and work with the Symmetry Blue app until keys are rolled.
+
+
+",
+STEP 2: Custom Keyset,,,,,,
+Custom Keyset (LEAF Cc),,Enabled,,,,
+Keyset ID (LkXXXXX),,Lk10016,,,,
+LEAF Customer Code (Decimal),,17,,,,
+STEP 3: AV + Output Formats,,,,,,
+Wiegand/OSDP,,,,,,
+Idle LED,,Amber,,,,
+Credential Report LED,,Green,,,,
+Beeper,,On,,,,
+Keypad Format,,8-bit,,,,
+Tamper Monitoring,,On,,,,
+F2F,,,,,,
+Casi Output Format,,CASI-4002,,,,
+Supervision State,,2-State,,,,
+Tamper Monitoring,,On,,,,
+STEP 4: High Frequency (HF),,,,,,
+Leaf Si Application (Kv1),,None,,,,
+Leaf Cc Application (Kc1),,Leaf Cc,,,,
+Other Custom HF Application,,None,,,,
+"Custom
+Application
+Notes",Lk10016,,,,,
+,,,,,,
+,,,,,,
+STEP 5: Card Serial Number (CSN),,,,,,
+MFC CSN,,Off,Standard,,,
+EV1/EV2 CSN,,Off,Standard,,,
+iClass CSN,,Off,Standard,,,
+ISO15693 CSN,,Off,Standard,,,
+ISO14443A CSN,,Off,,,,
+STEP 6: Low Frequency (LF),,,,,,
+FSK Prox,,On,,,,
+ASK Prox,,On,,,,
+Prox Filter,,,,,,
+Prox Filter,,On,,,,
+"Prox
+Filter
+Description","Filter 37-4, FC 11.",,,,,
+,,,,,,
+,,,,,,
+STEP 7: Mobile,,,,,,
+BLE Advertising Config,,AMAG (AMAG),,,,
+BLE Functionality,,Admin + Credentials,,,,
+NFC Functionality,,Disabled,,,,
+Mobile Keyset,,AMAG Transport,,,,
+"Legacy Credentials (Sym Blue, Brivo)",,On,,,,
+Transport Mode,,Off,,,,
+ECP DESFire,,Disabled,,,,
+ECP TCI,,1,,,,
+Apple Meridian Bit Count,,1,,,,
+MiFare2Go,,Disabled,,,,
+MiFare2Go DFNAME,,1,,,,
+Mobile Notes,,,,,,
+STEP 8: Part Numbers,,,,,,
+"Assigned 
+Part Numbers","WaveLynx P/N
+ETXX-7FM-LAM1-CMF1-Lk10016
+
+AMAG P/N
+939M-KP-CMF1-LK10016
+939M-CMF1-LK10016
+929M-CMF1-LK10016",,,,,

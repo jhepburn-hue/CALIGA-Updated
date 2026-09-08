@@ -1,0 +1,116 @@
+<!-- Configurations List Template -->
+{% extends 'base.html' %}
+
+{% block title %}All Configurations | Caliga{% endblock %}
+
+{% block content %}
+<div style="padding: 1rem 0;">
+    <!-- Flash Messages Banner -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid #10b981; color: #10b981; padding: 0.85rem 1.25rem; border-radius: 8px; margin-bottom: 1.5rem; font-size: 0.9rem; font-weight: 500;">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Page Header -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <div>
+            <h1 style="font-size: 1.75rem; font-weight: 700;">All Configurations</h1>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">Search and manage all reader configurations.</p>
+        </div>
+        <a href="/configs/new" style="background: var(--accent-primary); color: white; padding: 0.6rem 1.2rem; border-radius: 6px; text-decoration: none; font-weight: 500; font-size: 0.9rem;">+ New Configuration</a>
+    </div>
+
+    <!-- Search Bar -->
+    <div style="margin-bottom: 1.5rem;">
+        <input type="text" id="config-search" placeholder="Search by Dec ID, Hex ID, or Config Name..." 
+               style="width: 100%; padding: 0.75rem 1rem; background: var(--bg-surface); border: 1px solid var(--bg-border); color: var(--text-main); border-radius: 8px; font-size: 0.95rem; outline: none;">
+    </div>
+
+    <!-- Configuration Cards Grid -->
+    <div id="config-list-container" style="display: flex; flex-direction: column; gap: 0.75rem;">
+        {% for config in configs %}
+        <div class="config-card" data-search="{{ config.config_id_dec }} {{ config.config_id_hex }} {{ config.config_name }}" 
+             style="background: var(--bg-surface); border: 1px solid var(--bg-border); border-radius: 8px; padding: 1.1rem 1.25rem; display: flex; justify-content: space-between; align-items: center;">
+            
+            <!-- Left Metadata Info -->
+            <div style="display: flex; align-items: center; gap: 1.25rem;">
+                <span style="font-family: monospace; background: var(--bg-primary); border: 1px solid var(--bg-border); padding: 0.3rem 0.65rem; border-radius: 4px; font-size: 0.85rem; color: var(--accent-primary); font-weight: 600;">
+                    ID: {{ config.config_id_dec }} ({{ config.config_id_hex }})
+                </span>
+                <h3 style="font-size: 1.1rem; font-weight: 600;">{{ config.config_name }}</h3>
+            </div>
+
+            <!-- Right Status & Controls -->
+            <div style="display: flex; align-items: center; gap: 1.25rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem;">
+                    <span style="color: var(--text-muted);">Status:</span>
+                    <select data-current="{{ config.status.value }}" 
+                            onchange="updateStatus(this, '{{ config.filename }}', this.value)" 
+                            style="background: var(--bg-primary); border: 1px solid var(--bg-border); color: var(--text-main); padding: 0.35rem 0.6rem; border-radius: 6px; font-size: 0.85rem;">
+                        <option value="Active" {% if config.status.value == 'Active' or config.status == 'Active' %}selected{% endif %}>Active</option>
+                        <option value="POC" {% if config.status.value == 'POC' or config.status == 'POC' %}selected{% endif %}>POC</option>
+                        <option value="Archived" {% if config.status.value == 'Archived' or config.status == 'Archived' %}selected{% endif %}>Archived</option>
+                    </select>
+                </div>
+
+                <a href="/configs/view/{{ config.filename }}" 
+                   style="border: 1px solid var(--bg-border); color: var(--text-main); padding: 0.4rem 0.85rem; border-radius: 6px; text-decoration: none; font-size: 0.85rem; font-weight: 500;">
+                   View Profile →
+                </a>
+            </div>
+        </div>
+        {% else %}
+        <div style="background: var(--bg-surface); border: 1px solid var(--bg-border); padding: 2rem; border-radius: 8px; text-align: center; color: var(--text-muted);">
+            No configuration files found in the configs directory[cite: 3].
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Page Scripts -->
+<script>
+// Search Filtering Controller
+document.getElementById('config-search').addEventListener('input', function(e) {
+    const term = e.target.value.toLowerCase();
+    document.querySelectorAll('.config-card').forEach(card => {
+        const searchText = card.getAttribute('data-search').toLowerCase();
+        card.style.display = searchText.includes(term) ? 'flex' : 'none';
+    });
+});
+
+// Dynamic Status Modification API Handler
+function updateStatus(selectElem, filename, newStatus) {
+    const previousStatus = selectElem.getAttribute('data-current');
+
+    if (!confirm(`Are you sure you want to change status of this configuration to ${newStatus}?`)) {
+        // Rollback dropdown selection if user cancels
+        selectElem.value = previousStatus;
+        return;
+    }
+
+    fetch('/configs/api/status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename: filename, status: newStatus })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            selectElem.setAttribute('data-current', newStatus);
+        } else {
+            alert('Failed to update configuration status.');
+            selectElem.value = previousStatus;
+        }
+    })
+    .catch(() => {
+        alert('Network error updating status.');
+        selectElem.value = previousStatus;
+    });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,79 @@
+ACRE (MyPass BLE + ACTPro),,,,,
+End User Configuration Form,,,,,Card Details
+Config Name,CACR3,,,,Card Type
+Config ID,278,,,,Bitstream
+STEP 1: Hardware,,,,,Facility Code
+Wiegand/OSDP,ET10,ET20,ET25,,Starting Badge
+-2WS,No,No,No,,Notes
+-3WS,No,No,No,,
+-6WS,Yes,Yes,Yes,,
+-7WS,Yes,Yes,Yes,,
+,,,,,
+F2F,ET10,ET20,ET25,,Part Numbers
+-7FM,No,No,No,,
+,,,,,
+MCLP,ET10,ET20,ET25,,
+-7FM,No,No,No,,Notes/Other Products
+,,,,,"CACR1 with the following changes:
+- Mifare Classic ACTPro card support
+- Mifare DESFire ACTPro card support
+- Credential Report LED OFF (still beeps)
+- 4-bit Keypad Bitburst"
+STEP 2: Custom Keyset,,,,,
+Custom Keyset (LEAF Cc),,Enabled,,,
+Keyset ID (LkXXXXX),,Lk50021,,,
+LEAF Customer Code (Decimal),,136,,,
+STEP 3: AV + Output Formats,,,,,
+Wiegand/OSDP,,,,,
+Idle LED,,Red,,,
+Credential Report LED,,Off,,,
+Beeper,,On,,,
+Keypad Format,,4-bit,,,
+Tamper Monitoring,,On,,,
+F2F,,,,,
+Casi Output Format,,CASI-4002,,,
+Supervision State,,2-State,,,
+Tamper Monitoring,,On,,,
+STEP 4: High Frequency (HF),,,,,
+Leaf Si Application (Kv1),,Leaf Si,,,
+Leaf Cc Application (Kc1),,Leaf Cc,,,
+Other Custom HF Application,,None,,,
+"Custom
+Application
+Notes","- Kc1 of Lk50021 and Kv1 of Lk00001
+- MFC ACTPro
+- MFD ACTPro",,,,
+,,,,,
+,,,,,
+STEP 5: Card Serial Number (CSN),,,,,
+MFC CSN,,On,Standard,,
+EV1/EV2 CSN,,On,Standard,,
+iClass CSN,,On,Standard,,
+ISO15693 CSN,,On,Standard,,
+ISO14443A CSN,,On,,,
+STEP 6: Low Frequency (LF),,,,,
+FSK Prox,,On,,,
+ASK Prox,,On,,,
+Prox Filter,,,,,
+Prox Filter,,On,,,
+"Prox
+Filter
+Description",Ignore W36-8 with a facility code 15,,,,
+,,,,,
+,,,,,
+STEP 7: Mobile,,,,,
+BLE Advertising Config,,WaveLynx (ETHS),,,
+BLE Functionality,,Admin + Credentials,,,
+NFC Functionality,,Enabled,,,
+Mobile Keyset,,WaveLynx Transport,,,
+"Legacy Credentials (Sym Blue, Brivo)",,Off,,,
+Transport Mode,,On,,,
+ECP DESFire,,Disabled,,,
+ECP TCI,,1,,,
+Apple Meridian Bit Count,,1,,,
+MiFare2Go,,Disabled,,,
+MiFare2Go DFNAME,,1,,,
+Mobile Notes,,,,,
+STEP 8: Part Numbers,,,,,
+"Assigned 
+Part Numbers",,,,,

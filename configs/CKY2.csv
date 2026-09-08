@@ -1,0 +1,80 @@
+Kyndryl,,,,,,
+End User Configuration Form,,,,,Card Details,
+Config Name,CKY2,,,,Card Type,50H4 / 50D8
+Config ID,18,,,,Bitstream,W40-2
+STEP 1: Hardware,,,,,Facility Code,
+Wiegand/OSDP,ET10,ET20,ET25,,Starting Badge,"154,000,000,016"
+-2WS,No,No,No,,Notes,
+-3WS,No,No,No,,"For dual-tech: Casi cards similar to IBM (NS098). 
+HF W40-2 
+LF W40-1 
+LF offset -154000000000
+NS1742",
+-6WS,No,No,No,,,
+-7WS,Yes,Yes,Yes,,,
+,,,,,,
+F2F,ET10,ET20,ET25,,Part Numbers,
+-7FM,Yes,Yes,Yes,,,
+,,,,,,
+MCLP,ET10,ET20,ET25,,,
+-7FM,No,No,No,,Notes/Other Products,
+,,,,,"
+This is just CKY1 with an Apple Meridian bit count of 57. It will repalce CKY1 going forward",
+STEP 2: Custom Keyset,,,,,,
+Custom Keyset (LEAF Cc),,Enabled,,,,
+Keyset ID (LkXXXXX),,Lk10064,,,,
+LEAF Customer Code (Decimal),,81,,,,
+STEP 3: AV + Output Formats,,,,,,
+Wiegand/OSDP,,,,,,
+Idle LED,,Red,,,,
+Credential Report LED,,Green,,,,
+Beeper,,On,,,,
+Keypad Format,,8-bit,,,,
+Tamper Monitoring,,On,,,,
+F2F,,,,,,
+Casi Output Format,,CASI-4002,,,,
+Supervision State,,2-State,,,,
+Tamper Monitoring,,On,,,,
+STEP 4: High Frequency (HF),,,,,,
+Leaf Si Application (Kv1),,None,,,,
+Leaf Cc Application (Kc1),,Leaf Cc,,,,
+Other Custom HF Application,,None,,,,
+"Custom
+Application
+Notes",Lk10064,,,,,
+,,,,,,
+,,,,,,
+STEP 5: Card Serial Number (CSN),,,,,,
+MFC CSN,,Off,CSN_32_BIT_MSB,,,
+EV1/EV2 CSN,,Off,CSN_32_BIT_MSB,,,
+iClass CSN,,Off,CSN_32_BIT_MSB,,,
+ISO15693 CSN,,Off,CSN_32_BIT_MSB,,,
+ISO14443A CSN,,Off,,,,
+STEP 6: Low Frequency (LF),,,,,,
+FSK Prox,,On,,,,
+ASK Prox,,On,,,,
+Prox Filter,,,,,,
+Prox Filter,,Off,,,,
+"Prox
+Filter
+Description",,,,,,
+,,,,,,
+,,,,,,
+STEP 7: Mobile,,,,,,
+BLE Advertising Config,,Unique (Differs),,,,
+BLE Functionality,,Admin Only,,,,
+NFC Functionality,,Enabled,,,,
+Mobile Keyset,,Custom,,,,
+"Legacy Credentials (Sym Blue, Brivo)",,Off,,,,
+Transport Mode,,Off,,,,
+ECP DESFire,,Enabled,,,,
+ECP TCI,,020941,,,,
+Apple Meridian Bit Count,,57,,,,
+MiFare2Go,,Enabled,,,,
+MiFare2Go DFNAME,,A00000039656434103F532F000020941,,,,
+Mobile Notes,,,,,,
+STEP 8: Part Numbers,,,,,,
+"Assigned 
+Part Numbers","ETXX-7WS-CKY2-LK10064
+
+ETXX-7FM-CKY2-LK10064",,,,,

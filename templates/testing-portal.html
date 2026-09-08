@@ -1,0 +1,33 @@
+<!-- Firmware Testing Portal Template -->
+{% extends 'base.html' %}
+{% block title %}Testing Portal | Caliga{% endblock %}
+
+{% block content %}
+<div style="padding: 1rem 0;">
+    <!-- Page Header -->
+    <div style="margin-bottom: 2rem;">
+        <h1 style="font-size: 1.75rem; font-weight: 700;">Firmware Testing Portal</h1>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">Select a firmware target version to view configuration suites, assign testing tasks, and track pass/fail results.</p>
+    </div>
+
+    <!-- Firmware Version Workspace Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem;">
+        {% for ver in firmware_versions %}
+        <div style="background: var(--bg-surface); border: 1px solid var(--bg-border); border-radius: 8px; padding: 1.25rem; display: flex; flex-direction: column; justify-content: space-between; gap: 1.25rem;">
+            
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2 style="font-size: 1.2rem; font-weight: 700; color: var(--accent-primary); margin: 0;">{{ ver.version }}</h2>
+                <span style="font-size: 0.8rem; background: var(--bg-primary); border: 1px solid var(--bg-border); padding: 0.2rem 0.5rem; border-radius: 4px; color: var(--text-muted); font-family: monospace;">
+                    {{ ver.total_cases }} Active Sessions
+                </span>
+            </div>
+
+            <!-- Workspace Routing Button -->
+            <a href="/testing/version/{{ ver.version }}" style="display: block; text-align: center; background: var(--accent-primary); color: white; border: none; padding: 0.65rem; border-radius: 6px; font-weight: 600; font-size: 0.875rem; text-decoration: none;">
+                Select {{ ver.version }} Workspace ↗
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,88 @@
+Brivo (Wallet),,,,,
+End User Configuration Form,,,,,
+Config Name,CBR6,,,,Notes/Other Products
+Config ID,187,,,,"DOES BOTH WALLET AND BLE 
+
+Must use Brivo Plastics
+Must use 3.0+ HW
+
+LED Control lines:
+- Orange = Blue
+- Blue = Green
+
+Captouch is fully DISABLED.
+
+- Contains Kc1 of Lk50010 (Brivo Keyset)
+- Contains Kv1 of Lk00001 (WL MFG Keyset)
+- Contains APPVKcc and OCPSKcc of Lk50010 (OEM Keyset backwards compatibility for Allegion)"
+STEP 1: Hardware,,,,,
+Wiegand/OSDP,ET10,ET20,ET25,,
+-2WS,No,No,No,,
+-3WS,No,No,No,,
+-6WS,Yes,Yes,Yes,,
+-7WS,Yes,Yes,Yes,,
+,,,,,
+F2F,ET10,ET20,ET25,,
+-7FM,No,No,No,,
+,,,,,
+MCLP,ET10,ET20,ET25,,
+-7FM,No,No,No,,
+,,,,,
+STEP 2: Custom Keyset,,,,,
+Custom Keyset (LEAF Cc),,Enabled,,,
+Keyset ID (LkXXXXX),,Lk50010,,,
+LEAF Customer Code (Decimal),,57,,,
+STEP 3: AV + Output Formats,,,,,
+Wiegand/OSDP,,,,,
+Idle LED,,Red,,,
+Credential Report LED,,Green,,,
+Beeper,,On,,,
+Keypad Format,,8-bit,,,
+Tamper Monitoring,,On,,,
+F2F,,,,,
+Casi Output Format,,CASI-4002,,,
+Supervision State,,2-State,,,
+Tamper Monitoring,,On,,,
+STEP 4: High Frequency (HF),,,,,
+Leaf Si Application (Kv1),,Leaf Si,,,
+Leaf Cc Application (Kc1),,Leaf Cc,,,
+Other Custom HF Application,,Custom EV1,,,
+"Custom
+Application
+Notes","- Contains Kc1 of Lk50010 (Brivo Keyset)
+- Contains Kv1 of Lk00001 (WL MFG Keyset)
+- Contains APPVKcc and OCPSKcc of Lk50010 (OEM Keyset backwards compatibility for Allegion)",,,,
+,,,,,
+,,,,,
+STEP 5: Card Serial Number (CSN),,,,,
+MFC CSN,,Off,CSN_32_BIT_MSB,,
+EV1/EV2 CSN,,Off,CSN_32_BIT_MSB,,
+iClass CSN,,Off,CSN_32_BIT_MSB,,
+ISO15693 CSN,,Off,CSN_32_BIT_MSB,,
+ISO14443A CSN,,Off,,,
+STEP 6: Low Frequency (LF),,,,,
+FSK Prox,,On,,,
+ASK Prox,,On,,,
+Prox Filter,,,,,
+Prox Filter,,Off,,,
+"Prox
+Filter
+Description",,,,,
+,,,,,
+,,,,,
+STEP 7: Mobile,,,,,
+BLE Advertising Config,,Unique (Differs),,,
+BLE Functionality,,Admin + Credentials,,,
+NFC Functionality,,Enabled,,,
+Mobile Keyset,,Custom,,,
+"Legacy Credentials (Sym Blue, Brivo)",,On,,,
+Transport Mode,,Off,,,
+ECP DESFire,,Enabled,,,
+ECP TCI,,023000,,,
+Apple Meridian Bit Count,,128,,,
+MiFare2Go,,Enabled,,,
+MiFare2Go DFNAME,,A00000039656434103F532F000023000,,,
+Mobile Notes,,,,,
+STEP 8: Part Numbers,,,,,
+"Assigned 
+Part Numbers",,,,,

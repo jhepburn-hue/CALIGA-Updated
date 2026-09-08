@@ -1,0 +1,68 @@
+Interactive Brokers ,,,,,,
+End User Configuration Form,,,,,Card Details,
+Config Name,CIB1-Lk10011,,,,Card Type,50H8
+Config ID,19,,,,
+STEP 1: Hardware,,,,,Bitstream,W56-1
+Wiegand/OSDP,ET10,ET20,ET25,,Facility Code,555
+-2WS,Yes,Yes,Yes,,Starting Badge,"70,000"
+-3WS,Yes,Yes,Yes,,Notes,
+-6WS,No,No,No,,,
+-7WS,No,No,No,,,
+,,,,,,
+F2F,ET10,ET20,ET25,,,
+-7FM,No,No,No,,Part Numbers,
+,,,,,50H8-Lk10011,
+MCLP,ET10,ET20,ET25,,,
+-7FM,No,No,No,,,
+,,,,,Notes/Other Products,
+STEP 2: AV + Output Formats,,,,,"This form was created on 7/13/2020 using the previous CIB1 pdf's as reference.
+
+The 2.4.2.0 configuration was tested and verified to match this document by JB.
+
+NOTE: SHIP WITH TAMPER EVIDENT PACKAGING",
+Wiegand/OSDP,,,,,,
+Idle LED,,Red,,,,
+Credential Report LED,,Green,,,,
+Beeper,,On,,,,
+Keypad Format,,8-bit,,,,
+Tamper Monitoring,,On,,,,
+F2F,,,,,,
+Casi Output Format,,CASI-4002,,,,
+Supervision State,,2-State,,,,
+Tamper Monitoring,,On,,,,
+STEP 3: HF,,,,,,
+Leaf Application,,Leaf CC,,,,
+Other Custom HF Application,,None,,,,
+"Custom
+Application
+Notes",Lk10011,,,,,
+,,,,,,
+,,,,,,
+STEP 4: CSN,,,,,,
+MFC CSN,,Off,,,,
+EV1/EV2 CSN,,Off,,,,
+iClass CSN,,Off,,,,
+ISO15693 CSN,,Off,,,,
+ISO14443A CSN,,Off,,,,
+STEP 5: LF,,,,,,
+FSK Prox,,On,,,,
+ASK Prox,,On,,,,
+Prox Filter,,,,,,
+Prox Filter,,Off,,,,
+"Prox
+Filter
+Description",,,,,,
+,,,,,,
+,,,,,,
+STEP 6: Mobile,,,,,,
+BLE Advertising Config,,WaveLynx,,,,
+BLE Functionality,,Disabled,,,,
+NFC Functionality,,Disabled,,,,
+Mobile Keyset,,WaveLynx Transport,,,,
+Legacy Credentials (Symmetry Blue),,Off,,,,
+Transport Mode,,On,,,,
+Mobile Notes,,,,,,
+STEP 8: Part Numbers,,,,,,
+"Assigned 
+Part Numbers","ETxx-2WS-CIB1-Lk10011
+ETxx-3WS-CIB1-Lk10011",,,,,

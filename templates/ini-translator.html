@@ -1,0 +1,226 @@
+<!-- INI Translation Tool Template -->
+{% extends 'base.html' %}
+{% block title %}INI Translation Tool | Caliga{% endblock %}
+
+{% block content %}
+<div style="padding: 1rem 0;">
+    <!-- Navigation Back Link -->
+    <a href="/tools" style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem;"> Back to Tools Hub</a>
+
+    <!-- Page Header -->
+    <div style="margin: 1rem 0 1.5rem 0;">
+        <h1 style="font-size: 1.75rem; font-weight: 700; margin: 0;">INI Translation Tool</h1>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0.35rem;">
+            Translate INI configurations into structured test cards and verification criteria.
+        </p>
+    </div>
+
+    <!-- Workspace Grid Split -->
+    <div style="display: grid; grid-template-columns: 360px 1fr; gap: 1.5rem; align-items: start;">
+        
+        <!-- Translation Controls Panel -->
+        <div style="background: var(--bg-surface); border: 1px solid var(--bg-border); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem;">
+            
+            <!-- Stored Config Selection -->
+            <div>
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-main); margin-bottom: 0.5rem;">
+                    Select Stored Configuration:
+                </label>
+                <select id="configSelect" onchange="handleSelectChange()" style="width: 100%; background: var(--bg-primary); border: 1px solid var(--bg-border); color: var(--text-main); padding: 0.65rem; border-radius: 6px; font-size: 0.9rem;">
+                    <option value="">-- Choose a Stored Profile --</option>
+                    {% for cfg in configs %}
+                        <option value="{{ cfg.filename }}">{{ cfg.config_name }} ({{ cfg.config_id_hex }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Divider -->
+            <div style="display: flex; align-items: center; gap: 0.75rem; color: var(--text-muted); font-size: 0.85rem; font-weight: 600;">
+                <div style="flex: 1; border-top: 1px solid var(--bg-border);"></div>
+                <span>OR</span>
+                <div style="flex: 1; border-top: 1px solid var(--bg-border);"></div>
+            </div>
+
+            <!-- Custom File Upload -->
+            <div>
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-main); margin-bottom: 0.5rem;">
+                    Upload INI File:
+                </label>
+                <input type="file" id="iniFileInput" accept=".ini,.txt" onchange="handleFileChange()" style="width: 100%; background: var(--bg-primary); border: 1px solid var(--bg-border); color: var(--text-main); padding: 0.5rem; border-radius: 6px; font-size: 0.85rem;">
+            </div>
+
+            <!-- Target Version Selection -->
+            <div>
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-main); margin-bottom: 0.5rem;">
+                    Target Firmware Version:
+                </label>
+                <select id="versionSelect" style="width: 100%; background: var(--bg-primary); border: 1px solid var(--bg-border); color: var(--text-main); padding: 0.65rem; border-radius: 6px; font-size: 0.9rem;">
+                    {% for i in range(11, 5, -1) %}
+                        <option value="v5.4.{{ i }}">v5.4.{{ i }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Action Button -->
+            <button id="translateBtn" onclick="runTranslation()" style="width: 100%; background: var(--accent-primary); color: white; border: none; padding: 0.75rem; border-radius: 6px; font-weight: 600; font-size: 0.9rem; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
+                <span id="translateSpinner" class="spinner-border d-none"></span>
+                <span id="translateBtnText">Translate INI Settings</span>
+            </button>
+
+        </div>
+
+        <!-- Translation Results Region -->
+        <div style="background: var(--bg-surface); border: 1px solid var(--bg-border); border-radius: 8px; padding: 1.5rem; min-height: 500px; display: flex; flex-direction: column; gap: 1.25rem;">
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.75rem; border-bottom: 1px solid var(--bg-border);">
+                <h2 style="font-size: 1.1rem; font-weight: 600; margin: 0;" id="translationTitle">Translated Verification Criteria</h2>
+                <button onclick="toggleView()" id="toggleViewBtn" class="d-none" style="background: var(--bg-primary); border: 1px solid var(--bg-border); color: var(--text-main); padding: 0.35rem 0.75rem; border-radius: 4px; font-size: 0.8rem; cursor: pointer;">
+                    Show Raw INI
+                </button>
+            </div>
+
+            <!-- Test Cards Stream -->
+            <div id="translationOutput" style="display: flex; flex-direction: column; gap: 1.25rem;">
+                <div style="color: var(--text-muted); font-size: 0.9rem; text-align: center; padding: 4rem 0;">
+                    Select a configuration profile or upload an INI file, then click <strong>Translate INI Settings</strong>.
+                </div>
+            </div>
+
+            <!-- Raw INI Output -->
+            <textarea id="rawIniArea" readonly class="d-none" style="width: 100%; height: 420px; background: var(--bg-primary); border: 1px solid var(--bg-border); color: #10b981; font-family: monospace; font-size: 0.875rem; padding: 1rem; border-radius: 6px; outline: none; line-height: 1.5;"></textarea>
+
+        </div>
+
+    </div>
+</div>
+
+<!-- Loading Spinner Styles -->
+<style>
+.spinner-border {
+    width: 0.85rem;
+    height: 0.85rem;
+    border: 0.15em solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: spinner-border 0.75s linear infinite;
+}
+
+@keyframes spinner-border {
+    100% { transform: rotate(360deg); }
+}
+
+.d-none {
+    display: none !important;
+}
+</style>
+
+<!-- Translation Controller Script -->
+<script>
+let showingRaw = false;
+
+function handleSelectChange() {
+    if (document.getElementById("configSelect").value) {
+        document.getElementById("iniFileInput").value = "";
+    }
+}
+
+function handleFileChange() {
+    if (document.getElementById("iniFileInput").files.length > 0) {
+        document.getElementById("configSelect").value = "";
+    }
+}
+
+function runTranslation() {
+    const configVal = document.getElementById("configSelect").value;
+    const fileInput = document.getElementById("iniFileInput");
+    const version = document.getElementById("versionSelect").value;
+
+    const btn = document.getElementById("translateBtn");
+    const spinner = document.getElementById("translateSpinner");
+    const btnText = document.getElementById("translateBtnText");
+    const outputContainer = document.getElementById("translationOutput");
+    const rawArea = document.getElementById("rawIniArea");
+    const toggleBtn = document.getElementById("toggleViewBtn");
+
+    if (!configVal && fileInput.files.length === 0) {
+        alert("Please select a stored configuration profile OR upload an INI file.");
+        return;
+    }
+
+    btn.disabled = true;
+    spinner.classList.remove("d-none");
+    btnText.innerText = " Translating...";
+
+    const formData = new FormData();
+    formData.append("target_version", version);
+    if (fileInput.files.length > 0) {
+        formData.append("ini_file", fileInput.files[0]);
+    } else {
+        formData.append("filename", configVal);
+    }
+
+    fetch("/tools/api/translate-ini", {
+        method: "POST",
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        btn.disabled = false;
+        spinner.classList.add("d-none");
+        btnText.innerText = "Translate INI Settings";
+
+        if (data.success) {
+            document.getElementById("translationTitle").innerText = `Translation: ${data.filename}`;
+            rawArea.value = data.raw_ini;
+            toggleBtn.classList.remove("d-none");
+
+            renderTestCards(data.cards);
+        } else {
+            outputContainer.innerHTML = `<div style="color: #f87171; padding: 1rem; background: rgba(239, 68, 68, 0.1); border-radius: 6px;">Error: ${data.error}</div>`;
+        }
+    })
+    .catch(() => {
+        btn.disabled = false;
+        spinner.classList.add("d-none");
+        btnText.innerText = "Translate INI Settings";
+        outputContainer.innerHTML = `<div style="color: #f87171; padding: 1rem; background: rgba(239, 68, 68, 0.1); border-radius: 6px;">Network error translating INI parameters.</div>`;
+    });
+}
+
+function renderTestCards(cards) {
+    const container = document.getElementById("translationOutput");
+    container.classList.remove("d-none");
+    document.getElementById("rawIniArea").classList.add("d-none");
+    showingRaw = false;
+
+    container.innerHTML = cards.map(card => `
+        <div style="background: var(--bg-surface); border: 1px solid var(--bg-border); border-radius: 8px; padding: 1.25rem;">
+            <h2 style="font-size: 1.1rem; font-weight: 600; color: var(--text-main); margin: 0 0 1rem 0;">${card.title}</h2>
+            <ul style="margin: 0; padding-left: 1.5rem; display: flex; flex-direction: column; gap: 0.45rem; font-size: 0.95rem; color: var(--text-main); line-height: 1.5;">
+                ${card.criteria.map(item => `
+                    <li>${item.label}: <strong>${item.value}</strong></li>
+                `).join('')}
+            </ul>
+        </div>
+    `).join('');
+}
+
+function toggleView() {
+    const container = document.getElementById("translationOutput");
+    const rawArea = document.getElementById("rawIniArea");
+    const toggleBtn = document.getElementById("toggleViewBtn");
+
+    if (showingRaw) {
+        container.classList.remove("d-none");
+        rawArea.classList.add("d-none");
+        toggleBtn.innerText = "Show Raw INI";
+        showingRaw = false;
+    } else {
+        container.classList.add("d-none");
+        rawArea.classList.remove("d-none");
+        toggleBtn.innerText = "Show Translation";
+        showingRaw = true;
+    }
+}
+</script>
+{% endblock %}

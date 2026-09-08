@@ -1,0 +1,108 @@
+Fidelity (FMR),,,,,,,,,,,
+End User Configuration Form,,,,,Card Details,,,,,,
+Config Name,CFMR2,,,,Card Type,5024 (MiFare Classic),,,,,
+Config ID,348,,,,Bitstream,W40-3,,,,,
+STEP 1: Hardware,,,,,Facility Code,197,,,,,
+Wiegand/OSDP,ET10,ET20,ET25,,Starting Badge,,,,,,
+-2WS,No,No,No,,Notes,,,,,,
+-3WS,No,No,No,,,,,,,,
+-6WS,Yes,Yes,Yes,,,,,,,,
+-7WS,Yes,Yes,Yes,,,,,,,,
+,,,,,,,,,,,
+F2F,ET10,ET20,ET25,,Part Numbers,,,,,,
+-7FM,No,No,No,,,,,,,,
+,,,,,,,,,,,
+MCLP,ET10,ET20,ET25,,,,,,,,
+-7FM,No,No,No,,Notes/Other Products,,,,,,
+,,,,,"CFMR1 but with FIL Lk10092 key removed!
+
+From Ethos (legacy):
+NOTES FOR BUILDING THE CONFIGURATION:
+
+For Fidelity MFC App Support:
+   CardTypesApps[CT_MF_CLASSIC] = CA_MFC_FIDELITY
+
+Default MFC Sector = 2
+    OppSetting[MFC_APP_INDEX] = 0x0102
+
+
+Two keys needed for MFC authentication:
+    Fidelity_MFC:KA2            (BLE_MFC_KEYSET, 
+                                              KEY2_OFFSET)
+    Fidelity_MFC:KA2_XOR   (USER_APP_K1_K2_KEYSET,
+                                              KEY1_OFFSET)
+
+Fidelity MFC App ( MFC Sector = 2, Diversification Enabled)
+
+
+Reverse red and green OSDP LED commands:
+OPT_AUG, LED_OPTIONS_2_INDEX, OSDP_REVERSE_RED_GREEN_LED_MASK
+",,,,,,
+STEP 2: Custom Keyset,,,,,,,,,,,
+Custom Keyset (LEAF Cc),,Enabled,,,,,,,,,
+Keyset ID (LkXXXXX),,Lk10097,,,,,,,,,
+LEAF Customer Code (Decimal),,,,,,,,,,,
+STEP 3: AV + Output Formats,,,,,,,,,,,
+Wiegand/OSDP,,,,,,,,,,,
+Idle LED,,Red,,,,,,,,,
+Credential Report LED,,Off,,,,,,,,,","
+Beeper,,On,,,,,,,,,
+Keypad Format,,8-bit,,,,,,,,,
+Tamper Monitoring,,On,,,,,,,,,
+F2F,,,,,,,,,,,
+Casi Output Format,,CASI-4002,,,,,,,,,
+Supervision State,,2-State,,,,,,,,,
+Tamper Monitoring,,On,,,,,,,,,
+STEP 4: High Frequency (HF),,,,,,,,,,,
+Leaf Si Application (Kv1),,None,,,,,,,,,
+Leaf Cc Application (Kc1),,Leaf Cc,,,,,,,,,
+Other Custom HF Application,,Custom MFC,,,,,,,,,
+"Custom
+Application
+Notes","Fidelity Mifare Classic card application
+Lk10097 (FMR)",,,,,,,,,,
+,,,,,,,,,,,
+,,,,,,,,,,,
+STEP 5: Card Serial Number (CSN),,,,,,,,,,,
+MFC CSN,,Off,Standard,,,,,,,,
+EV1/EV2 CSN,,Off,Standard,,,,,,,,
+iClass CSN,,Off,Standard,,,,,,,,
+ISO15693 CSN,,Off,Standard,,,,,,,,
+ISO14443A CSN,,Off,,,,,,,,,
+STEP 6: Low Frequency (LF),,,,,,,,,,,
+FSK Prox,,On,,,,,,,,,
+ASK Prox,,On,,,,,,,,,
+Prox Filter,,,,,,,,,,,
+Prox Filter,,Off,,,,,,,,,
+"Prox
+Filter
+Description",,,,,,,,,,,
+,,,,,,,,,,,
+,,,,,,,,,,,
+STEP 7: Mobile,,,,,,,,,,,
+BLE Advertising Config,,Unique (Differs),,,,,,,,,
+BLE Functionality,,Admin Only,,,,,,,,,
+NFC Functionality,,Enabled,,,,,,,,,
+Mobile Keyset,,Custom,,,,,,,,,
+"Legacy Credentials (Sym Blue, Brivo)",,Off,,,,,,,,,
+Transport Mode,,Off,,,,,,,,,
+ECP DESFire,,Enabled,,,,,,,,,
+ECP TCI,,020962,,,,,,,,,
+Apple Meridian Bit Count,,40,,,,,,,,,
+MiFare2Go,,Enabled,,,,,,,,,
+MiFare2Go DFNAME,,A00000039656434103F532F000020962,,,,,,,,,
+Mobile Notes,Lk10097,,,,,,,,,,
+STEP 8: Part Numbers,,,,,,,,,,,
+"Assigned 
+Part Numbers","ET10-6WS-CFMR1-LK10092
+ET20-6WS-CFMR1-LK10092
+ET25-6WS-CFMR1-LK10092
+ET10-7WS-CFMR1-LK10092
+ET20-7WS-CFMR1-LK10092
+ET25-7WS-CFMR1-LK10092",,,,,,,,,,
+,,,,,,,,,,,
+,,,,,,,,,,,
+,,,,,,,,,,,
+,,,,,,,,,,,
+,,,,,,,,,,,
+ND 8/10/2023: Changed Idle LED from green to red per request from Dinesh,,,,,,,,,,,

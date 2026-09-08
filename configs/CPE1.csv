@@ -1,0 +1,82 @@
+Pepsi,,,,,,
+End User Configuration Form,,,,,Card Details,
+Config Name,CPE1,,,,Card Type,Dual-tech
+Config ID,43,,,,Bitstream,W35-0
+STEP 1: Hardware,,,,,Facility Code,1017
+Wiegand/OSDP,ET10,ET20,ET25,,Starting Badge,"55,000"
+-2WS,No,No,No,,Notes,
+-3WS,Yes,Yes,Yes,,"This is Pepsi's new configuration. Originally they used U007 with LEAF Si keys. This configuration introduces a new LEAF Cc custom keyset.
+
+Readers must work with existing ASK cards, though all ASK readers will be swapped out before new cards are issued.
+
+Pepsi didn't want to change the facility code, so the prox filter will need to filter all BID's greater than or equal to 55,000. (Last known BID purchased was 27,504)",
+-6WS,No,No,No,,,
+-7WS,Yes,Yes,Yes,,,
+,,,,,,
+F2F,ET10,ET20,ET25,,Part Numbers,
+-7FM,Yes,Yes,Yes,,50D8-Lk10030,
+,,,,,,
+MCLP,ET10,ET20,ET25,,,
+-7FM,No,No,No,,Notes/Other Products,
+,,,,,"Keypad behavior for WS is normal.
+
+Keypad behavior for FM: Backlight on keys does not blink on keypress. They stay on.
+
+NOTE: FM 1.4.3.0 read BLE MyPass and reported it as 40 bits. MyPass should be fully disabled in future versions of this configuration!!!",
+STEP 2: Custom Keyset,,,,,,
+Custom Keyset (LEAF Cc),,Enabled,,,,
+Keyset ID (LkXXXXX),,Lk10030,,,,
+LEAF Customer Code (Decimal),,35,,,,
+STEP 3: AV + Output Formats,,,,,,
+Wiegand/OSDP,,,,,,
+Idle LED,,Amber,,,,
+Credential Report LED,,Green,,,,
+Beeper,,On,,,,
+Keypad Format,,8-bit,,,,
+Tamper Monitoring,,On,,,,
+F2F,,,,,,
+Casi Output Format,,CASI-4002,,,,
+Supervision State,,4-State,,,,
+Tamper Monitoring,,On,,,,
+STEP 4: High Frequency (HF),,,,,,
+Leaf Si Application (Kv1),,None,,,,
+Leaf Cc Application (Kc1),,Leaf Cc,,,,
+Other Custom HF Application,,None,,,,
+"Custom
+Application
+Notes",Lk10030,,,,,
+,,,,,,
+,,,,,,
+STEP 5: Card Serial Number (CSN),,,,,,
+MFC CSN,,Off,Off,,,
+EV1/EV2 CSN,,Off,Off,,,
+iClass CSN,,Off,Off,,,
+ISO15693 CSN,,Off,Off,,,
+ISO14443A CSN,,Off,,,,
+STEP 6: Low Frequency (LF),,,,,,
+FSK Prox,,On,,,,
+ASK Prox,,On,,,,
+Prox Filter,,,,,,
+Prox Filter,,On,,,,
+"Prox
+Filter
+Description","Pepsi wants to use the same facility code so all BID's of 55,000 and greater will need to be rejected. (W35-0)",,,,,
+,,,,,,
+,,,,,,
+STEP 7: Mobile,,,,,,
+BLE Advertising Config,,WaveLynx (ETHS),,,,
+BLE Functionality,,Admin Only,,,,
+NFC Functionality,,Disabled,,,,
+Mobile Keyset,,WaveLynx Transport,,,,
+"Legacy Credentials (Sym Blue, Brivo)",,Off,,,,
+Transport Mode,,On,,,,
+ECP DESFire,,Disabled,,,,
+ECP TCI,,1,,,,
+Apple Meridian Bit Count,,1,,,,
+MiFare2Go,,Disabled,,,,
+MiFare2Go DFNAME,,1,,,,
+Mobile Notes,,,,,,
+STEP 8: Part Numbers,,,,,,
+"Assigned 
+Part Numbers","ETxx-7WS-CPE1-Lk10030
+ETxx-7FM-CPE1-Lk10030",,,,,

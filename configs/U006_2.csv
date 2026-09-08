@@ -1,0 +1,61 @@
+UPS - China,,,,,,
+End User Configuration Form,,,,,Card Details,
+Config Name,U006_2-Lk10047,,,,Card Type,50D8
+Config ID,62,,,,
+STEP 1: Hardware,,,,,Bitstream,W35-0
+Wiegand/OSDP,ET10,ET20,ET25,,Facility Code,109
+-2WS,No,No,No,,Starting Badge,"100,000"
+-3WS,No,No,No,,Notes,
+-6WS,No,No,No,,"Current LF prox cards are W35-0, FC: 107",
+-7WS,Yes,Yes,Yes,,,
+,,,,,,
+F2F,ET10,ET20,ET25,,,
+-7FM,No,No,No,,Part Numbers,
+,,,,,50D8-Lk10047,
+MCLP,ET10,ET20,ET25,,,
+-7FM,No,No,No,,,
+,,,,,Notes/Other Products,
+STEP 2: AV + Output Formats,,,,,"U006 is the original configuration (keyset) for UPS.  U006_2 was added as a configuration at a later date as UPS wanted a separate keyset for China offices.  When this_2 was added, we retroactively labelled U006 as U006_1 ...so U006 is the same as U006_1 and U006_2 is a separate keyset just for China UPS offices",
+Wiegand/OSDP,,,,,,
+Idle LED,,Red,,,,
+Credential Report LED,,Red,,,,
+Beeper,,Off,,,,
+Keypad Format,,8-bit,,,,
+Tamper Monitoring,,Off,,,,
+F2F,,,,,,
+Casi Output Format,,CASI-4002,,,,
+Supervision State,,2-State,,,,
+Tamper Monitoring,,On,,,,
+STEP 3: HF,,,,,,
+Leaf Application,,Leaf CC,,,,
+Other Custom HF Application,,None,,,,
+"Custom
+Application
+Notes",Lk10047,,,,,
+,,,,,,
+,,,,,,
+STEP 4: CSN,,,,,,
+MFC CSN,,On,,,,
+EV1/EV2 CSN,,Off,,,,
+iClass CSN,,Off,,,,
+ISO15693 CSN,,Off,,,,
+ISO14443A CSN,,Off,,,,
+STEP 5: LF,,,,,,
+FSK Prox,,On,,,,
+ASK Prox,,On,,,,
+Prox Filter,,,,,,
+Prox Filter,,On,,,,
+"Prox
+Filter
+Description","Filters out:
+W35-0
+FC: 109",,,,,
+,,,,,,
+,,,,,,
+STEP 6: BLE,,,,,,
+BLE Functionality,,Admin Only,,,,
+STEP 7: NFC,,,,,,
+NFC Functionality,,Disabled,,,,
+STEP 8: Part Numbers,,,,,,
+"Assigned 
+Part Numbers",ETxx-7WS-U006_2-Lk10047,,,,,

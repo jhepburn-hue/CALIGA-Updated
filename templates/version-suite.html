@@ -1,0 +1,254 @@
+<!-- Firmware Version Test Workspace Template -->
+{% extends 'base.html' %}
+{% block title %}{{ version }} Test Workspace | Caliga{% endblock %}
+
+{% block content %}
+<div style="padding: 1rem 0;">
+    <!-- Navigation Back Link -->
+    <a href="/testing" style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem;">  Back to Firmware Versions</a>
+
+    <!-- Header & Suite Metrics Bar -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin: 1rem 0 1.5rem 0;">
+        <div>
+            <h1 style="font-size: 1.75rem; font-weight: 700;">Workspace: {{ version }}</h1>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">Select configurations to generate test cases, assign team tasks, and run feature checks.</p>
+        </div>
+
+        <!-- Metric Counter Totals -->
+        <div style="display: flex; gap: 1rem; background: var(--bg-surface); border: 1px solid var(--bg-border); padding: 0.6rem 1.2rem; border-radius: 8px;">
+            <div style="text-align: center;">
+                <span style="font-size: 0.75rem; color: var(--text-muted); display: block; font-weight: 600;">TOTAL CHECKS</span>
+                <span style="font-size: 1.1rem; font-weight: 700;" id="totalChecksCount">0</span>
+            </div>
+            <div style="border-left: 1px solid var(--bg-border); padding-left: 1rem; text-align: center;">
+                <span style="font-size: 0.75rem; color: #10b981; display: block; font-weight: 600;">PASSED</span>
+                <span style="font-size: 1.1rem; font-weight: 700; color: #10b981;" id="passedChecksCount">0</span>
+            </div>
+            <div style="border-left: 1px solid var(--bg-border); padding-left: 1rem; text-align: center;">
+                <span style="font-size: 0.75rem; color: #f87171; display: block; font-weight: 600;">FAILED</span>
+                <span style="font-size: 1.1rem; font-weight: 700; color: #f87171;" id="failedChecksCount">0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Workspace Split Layout -->
+    <div style="display: grid; grid-template-columns: 320px 1fr; gap: 1.5rem; align-items: start;">
+        
+        <!-- Selection Sidebar -->
+        <div style="background: var(--bg-surface); border: 1px solid var(--bg-border); border-radius: 8px; padding: 1.25rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h2 style="font-size: 1rem; font-weight: 600;">Select Configurations</h2>
+                <div style="font-size: 0.8rem; display: flex; gap: 0.5rem;">
+                    <a href="#" onclick="selectAllConfigs(true)" style="color: var(--accent-primary); text-decoration: none;">All</a>
+                    <span style="color: var(--text-muted);">|</span>
+                    <a href="#" onclick="selectAllConfigs(false)" style="color: var(--text-muted); text-decoration: none;">Clear</a>
+                </div>
+            </div>
+
+            <!-- Default Assignee Selector -->
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.35rem; font-weight: 500;">Default Assignee:</label>
+                <select id="defaultAssignee" style="width: 100%; background: var(--bg-primary); border: 1px solid var(--bg-border); color: var(--text-main); padding: 0.5rem; border-radius: 6px; font-size: 0.875rem;">
+                    {% for member in team_members %}
+                        <option value="{{ member }}">{{ member }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Configurations List -->
+            <div style="max-height: 380px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.25rem; padding-right: 0.25rem;">
+                {% for config in configs %}
+                <label style="display: flex; align-items: center; gap: 0.65rem; font-size: 0.875rem; background: var(--bg-primary); padding: 0.5rem 0.75rem; border-radius: 6px; border: 1px solid var(--bg-border); cursor: pointer;">
+                    <input type="checkbox" class="config-checkbox" value="{{ config.filename }}" {% if loop.index <= 3 %}checked{% endif %}>
+                    <span><strong>{{ config.config_name }}</strong> <span style="color: var(--text-muted); font-size: 0.8rem;">({{ config.config_id_hex }})</span></span>
+                </label>
+                {% endfor %}
+            </div>
+
+            <!-- Generation Action Button -->
+            <button onclick="generateCases()" style="width: 100%; background: var(--accent-primary); color: white; border: none; padding: 0.75rem; border-radius: 6px; font-weight: 600; font-size: 0.9rem; cursor: pointer;">
+                + Generate Test Cases
+            </button>
+        </div>
+
+        <!-- Test Cases Stream -->
+        <div style="background: var(--bg-surface); border: 1px solid var(--bg-border); border-radius: 8px; padding: 1.25rem; min-height: 520px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+                <h2 style="font-size: 1rem; font-weight: 600;">Configurations Test Cases</h2>
+                <span style="font-size: 0.85rem; color: var(--text-muted);" id="activeCaseCounter">0 Cases Active</span>
+            </div>
+
+            <div id="casesContainer" style="display: flex; flex-direction: column; gap: 1.25rem;">
+                <div style="color: var(--text-muted); font-size: 0.875rem; text-align: center; padding: 4rem 0;">
+                    No test cases generated for <strong>{{ version }}</strong> yet. Select configurations on the left to begin.
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Data Transfer Tags -->
+<script id="team-members-data" type="application/json">
+    {{ team_members | tojson }}
+</script>
+<script id="existing-cases-data" type="application/json">
+    {{ existing_cases | tojson }}
+</script>
+
+<!-- Component Controller Script -->
+<script>
+const VERSION = "{{ version }}";
+const TEAM_MEMBERS = JSON.parse(document.getElementById('team-members-data').textContent);
+let CASES = JSON.parse(document.getElementById('existing-cases-data').textContent);
+
+window.addEventListener('DOMContentLoaded', () => {
+    if (Object.keys(CASES).length > 0) {
+        renderCases(Object.values(CASES));
+    }
+});
+
+function selectAllConfigs(state) {
+    document.querySelectorAll('.config-checkbox').forEach(cb => cb.checked = state);
+}
+
+function generateCases() {
+    const selectedConfigs = Array.from(document.querySelectorAll('.config-checkbox:checked')).map(cb => cb.value);
+    const defaultAssignee = document.getElementById('defaultAssignee').value;
+
+    if (selectedConfigs.length === 0) {
+        alert("Please select at least one configuration.");
+        return;
+    }
+
+    fetch('/testing/api/generate-cases', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            version: VERSION,
+            configs: selectedConfigs,
+            assigned_to: defaultAssignee
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            data.cases.forEach(c => CASES[c.case_id] = c);
+            renderCases(Object.values(CASES));
+        }
+    });
+}
+
+function renderCases(casesList) {
+    const container = document.getElementById("casesContainer");
+    document.getElementById("activeCaseCounter").innerText = `${casesList.length} Active Cases`;
+
+    let gTotal = 0, gPassed = 0, gFailed = 0;
+
+    container.innerHTML = casesList.map(c => {
+        gTotal += c.checks.length;
+        gPassed += c.passed_count;
+        gFailed += c.failed_count;
+
+        return `
+            <div style="background: var(--bg-primary); border: 1px solid var(--bg-border); border-radius: 8px; padding: 1.1rem; display: flex; flex-direction: column; gap: 0.85rem;">
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--bg-border); padding-bottom: 0.75rem;">
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <span style="font-weight: 700; font-size: 1.1rem; color: var(--accent-primary);">${c.config_name}</span>
+                        <span style="font-size: 0.8rem; font-weight: 600; color: ${c.failed_count > 0 ? '#f87171' : (c.passed_count === c.total_checks && c.total_checks > 0 ? '#10b981' : '#f59e0b')};">
+                            (${c.passed_count}/${c.total_checks} Checks Passed)
+                        </span>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 0.65rem;">
+                        <select onchange="updateMeta('${c.case_id}', 'assigned_to', this.value)" style="background: var(--bg-surface); border: 1px solid var(--bg-border); color: var(--text-main); padding: 0.35rem 0.6rem; border-radius: 6px; font-size: 0.8rem;">
+                            ${TEAM_MEMBERS.map(m => `<option value="${m}" ${m === c.assigned_to ? 'selected' : ''}>Assigned: ${m}</option>`).join('')}
+                        </select>
+                        <a href="/configs/view/${c.filename}" target="_blank" style="border: 1px solid var(--bg-border); color: var(--text-main); padding: 0.35rem 0.6rem; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 500;">
+                            Open Profile ↗
+                        </a>
+                    </div>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    ${c.checks.map(chk => `
+                        <div style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface); padding: 0.5rem 0.75rem; border-radius: 6px; border: 1px solid var(--bg-border);">
+                            <div style="font-size: 0.85rem; color: var(--text-main);">
+                                <strong style="color: var(--accent-primary); font-size: 0.775rem; margin-right: 0.4rem;">[${chk.category}]</strong>
+                                ${chk.label}
+                            </div>
+                            <div style="display: flex; gap: 0.35rem;">
+                                <button onclick="setCheckStatus('${c.case_id}', '${chk.check_id}', 'PASS')" style="background: ${chk.status === 'PASS' ? '#10b981' : 'transparent'}; color: ${chk.status === 'PASS' ? '#ffffff' : 'var(--text-muted)'}; border: 1px solid ${chk.status === 'PASS' ? '#10b981' : 'var(--bg-border)'}; padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; cursor: pointer;">
+                                    PASS
+                                </button>
+                                <button onclick="setCheckStatus('${c.case_id}', '${chk.check_id}', 'FAIL')" style="background: ${chk.status === 'FAIL' ? '#ef4444' : 'transparent'}; color: ${chk.status === 'FAIL' ? '#ffffff' : 'var(--text-muted)'}; border: 1px solid ${chk.status === 'FAIL' ? '#ef4444' : 'var(--bg-border)'}; padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; cursor: pointer;">
+                                    FAIL
+                                </button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div style="display: flex; gap: 0.5rem; align-items: center; margin-top: 0.25rem;">
+                    <input type="text" id="note-${c.case_id}" placeholder="Enter notes or failure description..." value="${c.notes || ''}" onchange="updateMeta('${c.case_id}', 'notes', this.value)" style="flex: 1; background: var(--bg-surface); border: 1px solid var(--bg-border); color: var(--text-main); padding: 0.45rem 0.75rem; border-radius: 6px; font-size: 0.85rem; outline: none;">
+                    
+                    ${c.failed_count > 0 ? `
+                        <button onclick="sendSlackAlert('${c.case_id}')" style="background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #f87171; padding: 0.45rem 0.85rem; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer;">
+                            Send Slack Chat Alert
+                        </button>
+                    ` : ''}
+                </div>
+
+            </div>
+        `;
+    }).join('');
+
+    document.getElementById("totalChecksCount").innerText = gTotal;
+    document.getElementById("passedChecksCount").innerText = gPassed;
+    document.getElementById("failedChecksCount").innerText = gFailed;
+}
+
+function setCheckStatus(caseId, checkId, status) {
+    fetch('/testing/api/update-check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ version: VERSION, case_id: caseId, check_id: checkId, status: status })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            CASES[caseId] = data.case;
+            renderCases(Object.values(CASES));
+        }
+    });
+}
+
+function updateMeta(caseId, field, value) {
+    const payload = { version: VERSION, case_id: caseId };
+    payload[field] = value;
+    fetch('/testing/api/update-meta', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+}
+
+function sendSlackAlert(caseId) {
+    const note = document.getElementById(`note-${caseId}`).value;
+    fetch('/testing/api/send-slack-alert', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ version: VERSION, case_id: caseId, note: note })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert("Slack alert sent successfully!");
+        } else {
+            alert("Failed to send Slack alert.");
+        }
+    });
+}
+</script>
+{% endblock %}

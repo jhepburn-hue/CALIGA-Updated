@@ -1,0 +1,90 @@
+Brivo (OEM Keyset Config),,,,,
+OEM Configuration Form,,,,,
+Config Name,CBR4-Lk50010,,,,Notes/Other Products
+Config ID,170,,,,
+STEP 1: Hardware,,,,,"Must use Brivo Plastics
+Must use 3.0+ HW
+
+LED Control lines:
+- Orange = Blue
+- Blue = Green
+
+Captouch Threshold = 30
+
+- Contains Kc1 of Lk50010 (Brivo Keyset)
+- Contains Kv1 of Lk00001 (WL MFG Keyset)
+- Contains APPVKcc and OCPSKcc of Lk50010 (OEM Keyset backwards compatibility for Allegion)
+
+Test Brivo Mobile Pass with the BLE Tester App"
+Wiegand/OSDP,ET10,ET20,ET25,,
+-2WS,No,No,No,,
+-3WS,No,No,No,,
+-6WS,No,Yes,Yes,,
+-7WS,No,Yes,Yes,,
+,,,,,
+F2F,ET10,ET20,ET25,,
+-7FM,No,No,No,,
+,,,,,
+MCLP,ET10,ET20,ET25,,
+-7FM,No,No,No,,
+,,,,,
+STEP 2: Custom Keyset,,,,,
+Custom Keyset,,Enabled,,,
+Keyset ID,,Lk50010,,,
+LEAF Customer Code (Decimal),,57,,,
+STEP 3: AV + Output Formats,,,,,
+Wiegand/OSDP,,,,,
+Idle LED,,Red,,,
+Credential Report LED,,Green,,,
+Beeper,,On,,,
+Keypad Format,,8-bit,,,
+Tamper Monitoring,,On,,,
+F2F,,,,,
+Casi Output Format,,CASI-4002,,,
+Supervision State,,2-State,,,
+Tamper Monitoring,,On,,,
+STEP 4: High Frequency (HF),,,,,
+Leaf Application,,Leaf CC,,,
+Other Custom HF Application,,Custom EV1,,,
+"Custom
+Application
+Notes","- Contains Kc1 of Lk50010 (Brivo Keyset)
+- Contains Kv1 of Lk00001 (WL MFG Keyset)
+- Contains APPVKcc and OCPSKcc of Lk50010 (OEM Keyset backwards compatibility for Allegion)",,,,
+,,,,,
+,,,,,
+STEP 5: Card Serial Number (CSN),,,,,
+MFC CSN,,On,,,
+EV1/EV2 CSN,,On,,,
+iClass CSN,,On,,,
+ISO15693 CSN,,On,,,
+ISO14443A CSN,,On,,,
+STEP 6: Low Frequency (LF),,,,,
+FSK Prox,,On,,,
+ASK Prox,,On,,,
+Prox Filter,,,,,
+Prox Filter,,Off,,,
+"Prox
+Filter
+Description",,,,,
+,,,,,
+,,,,,
+STEP 7: Mobile,,,,,
+BLE Advertising Config,,Brivo (BRVO),,,
+BLE Functionality,,Admin + Credentials,,,
+NFC Functionality,,Disabled,,,
+Mobile Keyset,,Custom,,,
+"Legacy Credentials (Sym Blue, Brivo)",,On,,,
+Transport Mode,,Off,,,
+ECP DESFire,,Disabled,,,
+ECP TCI,,,,,
+Mobile Notes,,,,,
+STEP 8: Part Numbers,,,,,
+"Assigned 
+Part Numbers",,,,,
+,,,,,
+,,,,,
+,,,,,
+,,,,,
+,,,,,
+JB 7/21/2022 - Approved by Rich Crowder for production on 7/20/2022,,,,,

@@ -1,0 +1,72 @@
+Mass General Hospital (MGH),,,,,,
+End User Configuration Form,,,,,Card Details,
+Config Name,CMG1,,,,Card Type,Dual-Tech 50d8
+Config ID,25,,,,
+STEP 1: Hardware,,,,,Bitstream,W36-8 (MGH)
+Wiegand/OSDP,ET10,ET20,ET25,,Facility Code,31
+-2WS,No,No,No,,Starting Badge,"2,000,000"
+-3WS,Yes,Yes,Yes,,Notes,
+-6WS,No,No,No,,Same number on both Prox/Leaf sides of card.,
+-7WS,Yes,Yes,Yes,,,
+,,,,,,
+F2F,ET10,ET20,ET25,,,
+-7FM,No,No,No,,Part Numbers,
+,,,,,Cards: 50d8-Lk10015 = DESFire EV2 LEAF Smart Cards with MGH custom keys and Partner's Common keys,
+MCLP,ET10,ET20,ET25,,,
+-7FM,No,No,No,,,
+,,,,,Notes/Other Products,
+STEP 2: AV + Output Formats,,,,,"Mass Gen. Hospital is part of the Partner's Hospital transition strategy. Part of Lk10015 is unique to MGH, and part is common to other Partner's Hospitals.
+
+Kc1 - Kc8: Unique MGH keys
+
+Kc9 - Kc16: Common Partner's Hospital keys
+LEAF_CC_NEWTON_WELLESLEY_Lk10031
+
+Reader's programmed with CMG1 will only have one key, Kc1 (MGH unique). They will not have a Partner's Hospitals key.",
+Wiegand/OSDP,,,,,,
+Idle LED,,Red,,,,
+Credential Report LED,,Green,,,,
+Beeper,,On,,,,
+Keypad Format,,8-bit,,,,
+Tamper Monitoring,,On,,,,
+F2F,,,,,,
+Casi Output Format,,CASI-4002,,,,
+Supervision State,,2-State,,,,
+Tamper Monitoring,,On,,,,
+STEP 3: HF,,,,,,
+Leaf Application,,Leaf CC,,,,
+Other Custom HF Application,,None,,,,
+"Custom
+Application
+Notes",Lk10015,,,,,
+,,,,,,
+,,,,,,
+STEP 4: CSN,,,,,,
+MFC CSN,,Off,,,,
+EV1/EV2 CSN,,Off,,,,
+iClass CSN,,Off,,,,
+ISO15693 CSN,,Off,,,,
+ISO14443A CSN,,Off,,,,
+STEP 5: LF,,,,,,
+FSK Prox,,On,,,,
+ASK Prox,,On,,,,
+Prox Filter,,,,,,
+Prox Filter,,On,,,,
+"Prox
+Filter
+Description",Filter W36-8 FC 31 ,,,,,
+,,,,,,
+,,,,,,
+STEP 6: BLE,,,,,,
+BLE Functionality,,Admin Only,,,,
+STEP 7: NFC,,,,,,
+NFC Functionality,,Disabled,,,,
+STEP 8: Part Numbers,,,,,,
+"Assigned 
+Part Numbers","CMG1-Lk10015 - One Key configuration
+
+ET10-3WS-CMG1-Lk10015 = Mullion Mount Reader with Prox + High Frequency DESFire EV2 LEAF enabled- with MGH Private Keys ONLY & Custom configuration for Prox Filter
+
+ET20-3WS-CMG1-Lk10015 = Single Gang Reader with Prox + High Frequency DESFire EV2 LEAF enabled- with MGH MGH Private Keys ONLY & Custom configuration for Prox Filter
+
+ET25-3WS-CMG1-Lk10015 = Single Gang Reader with Keypad - Prox + High Frequency DESFire EV2 LEAF enabled- with MGH MGH Private Keys ONLY & Custom configuration for Prox Filte",,,,,

@@ -1,0 +1,202 @@
+<!-- Batch Token Generator Template -->
+{% extends 'base.html' %}
+{% block title %}Batch Token Generator | Caliga{% endblock %}
+
+{% block content %}
+<div style="padding: 1rem 0;">
+    <!-- Navigation Back Link -->
+    <a href="/tools" style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem;">← Back to Tools Hub</a>
+
+    <!-- Page Header -->
+    <div style="margin: 1rem 0 1.5rem 0;">
+        <h1 style="font-size: 1.75rem; font-weight: 700; margin: 0;">Batch Token Generator</h1>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0.35rem;">
+            Bulk compile Profile BINs and Firmware DCKs on Forge and register active token records in PocketBase.
+        </p>
+    </div>
+
+    <!-- Main Grid Workspace -->
+    <div style="display: grid; grid-template-columns: 360px 1fr; gap: 1.5rem; align-items: start;">
+        
+        <!-- Selection Sidebar -->
+        <div style="background: var(--bg-surface); border: 1px solid var(--bg-border); border-radius: 8px; padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem;">
+            
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2 style="font-size: 1rem; font-weight: 600; margin: 0;">Select Configurations</h2>
+                <div style="font-size: 0.8rem; display: flex; gap: 0.5rem;">
+                    <a href="#" onclick="selectAllConfigs(true)" style="color: var(--accent-primary); text-decoration: none;">Select All</a>
+                    <span style="color: var(--text-muted);">|</span>
+                    <a href="#" onclick="selectAllConfigs(false)" style="color: var(--text-muted); text-decoration: none;">Clear</a>
+                </div>
+            </div>
+
+            <!-- Firmware Selection -->
+            <div>
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-main); margin-bottom: 0.35rem;">
+                    Target Firmware Version:
+                </label>
+                <select id="targetVersionSelect" style="width: 100%; background: var(--bg-primary); border: 1px solid var(--bg-border); color: var(--text-main); padding: 0.55rem; border-radius: 6px; font-size: 0.875rem;">
+                    {% for i in range(11, 5, -1) %}
+                        <option value="v5.4.{{ i }}">v5.4.{{ i }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Configuration Options List -->
+            <div style="max-height: 380px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.4rem; padding-right: 0.25rem;">
+                {% for config in configs %}
+                <label style="display: flex; align-items: center; gap: 0.65rem; font-size: 0.875rem; background: var(--bg-primary); padding: 0.5rem 0.75rem; border-radius: 6px; border: 1px solid var(--bg-border); cursor: pointer;">
+                    <input type="checkbox" class="config-checkbox" value="{{ config.filename }}" {% if loop.index <= 3 %}checked{% endif %}>
+                    <span><strong>{{ config.config_name }}</strong> <span style="color: var(--text-muted); font-size: 0.8rem;">({{ config.config_id_hex }})</span></span>
+                </label>
+                {% endfor %}
+            </div>
+
+            <!-- Execution Action Button -->
+            <button id="batchProcessBtn" onclick="runBatchTokens()" style="width: 100%; background: var(--accent-primary); color: white; border: none; padding: 0.75rem; border-radius: 6px; font-weight: 600; font-size: 0.9rem; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
+                <span id="batchSpinner" class="spinner-border d-none"></span>
+                <span id="batchBtnText">Generate & Register Tokens</span>
+            </button>
+
+        </div>
+
+        <!-- Token Stream Results Region -->
+        <div style="background: var(--bg-surface); border: 1px solid var(--bg-border); border-radius: 8px; padding: 1.25rem; min-height: 520px; display: flex; flex-direction: column; gap: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--bg-border); padding-bottom: 0.75rem;">
+                <h2 style="font-size: 1rem; font-weight: 600; margin: 0;">PocketBase Token Registry Stream</h2>
+                <span style="font-size: 0.85rem; color: var(--text-muted);" id="registryCounter">0 Configurations Processed</span>
+            </div>
+
+            <div id="resultsContainer" style="display: flex; flex-direction: column; gap: 1rem;">
+                <div style="color: var(--text-muted); font-size: 0.875rem; text-align: center; padding: 5rem 0;">
+                    Select configurations on the left and click <strong>Generate & Register Tokens</strong> to begin bulk compilation.
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Component Styles -->
+<style>
+.spinner-border {
+    width: 0.85rem;
+    height: 0.85rem;
+    border: 0.15em solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: spinner-border 0.75s linear infinite;
+}
+
+@keyframes spinner-border {
+    100% { transform: rotate(360deg); }
+}
+
+.d-none {
+    display: none !important;
+}
+</style>
+
+<!-- Component Controller Scripts -->
+<script>
+function selectAllConfigs(state) {
+    document.querySelectorAll('.config-checkbox').forEach(cb => cb.checked = state);
+}
+
+function runBatchTokens() {
+    const selectedConfigs = Array.from(document.querySelectorAll('.config-checkbox:checked')).map(cb => cb.value);
+    const targetVersion = document.getElementById("targetVersionSelect").value;
+
+    if (selectedConfigs.length === 0) {
+        alert("Please select at least one configuration profile.");
+        return;
+    }
+
+    const btn = document.getElementById("batchProcessBtn");
+    const spinner = document.getElementById("batchSpinner");
+    const btnText = document.getElementById("batchBtnText");
+    const resultsContainer = document.getElementById("resultsContainer");
+
+    btn.disabled = true;
+    spinner.classList.remove("d-none");
+    btnText.innerText = " Processing Batch...";
+
+    resultsContainer.innerHTML = `
+        <div style="color: var(--text-muted); font-size: 0.9rem; text-align: center; padding: 4rem 0;">
+            Compiling artifacts on Forge and registering PocketBase tokens for ${selectedConfigs.length} configuration(s)...
+        </div>
+    `;
+
+    fetch('/tools/api/generate-batch-tokens', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            version: targetVersion,
+            configs: selectedConfigs
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        btn.disabled = false;
+        spinner.classList.add("d-none");
+        btnText.innerText = "Generate & Register Tokens";
+
+        if (data.success && data.results) {
+            document.getElementById("registryCounter").innerText = `${data.results.length} Configurations Processed (${targetVersion})`;
+            renderResults(data.results);
+        } else {
+            resultsContainer.innerHTML = `<div style="color: #f87171; padding: 1rem; background: rgba(239, 68, 68, 0.1); border-radius: 6px;">Error: ${data.error}</div>`;
+        }
+    })
+    .catch(() => {
+        btn.disabled = false;
+        spinner.classList.add("d-none");
+        btnText.innerText = "Generate & Register Tokens";
+        resultsContainer.innerHTML = `<div style="color: #f87171; padding: 1rem; background: rgba(239, 68, 68, 0.1); border-radius: 6px;">Network or server error during batch processing.</div>`;
+    });
+}
+
+function renderResults(results) {
+    const container = document.getElementById("resultsContainer");
+    container.innerHTML = results.map(r => {
+        if (!r.success) {
+            return `
+                <div style="background: var(--bg-primary); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; padding: 1rem;">
+                    <strong style="color: #f87171; font-size: 1rem;">${r.config_name}</strong>
+                    <div style="color: #f87171; font-size: 0.85rem; margin-top: 0.35rem;">Compilation Error: ${r.error}</div>
+                </div>
+            `;
+        }
+
+        return `
+            <div style="background: var(--bg-primary); border: 1px solid var(--bg-border); border-radius: 8px; padding: 1.1rem; display: flex; flex-direction: column; gap: 0.75rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--bg-border); padding-bottom: 0.5rem;">
+                    <strong style="color: var(--accent-primary); font-size: 1.1rem;">${r.config_name}</strong>
+                    <span style="font-size: 0.75rem; background: rgba(16, 185, 129, 0.15); color: #10b981; padding: 0.25rem 0.6rem; border-radius: 4px; font-weight: 600;">ACTIVE</span>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">
+                            ${r.profile_token_name} ${r.profile_cached ? '<span style="color: #f59e0b;">(Cached)</span>' : '<span style="color: #10b981;">(New)</span>'}:
+                        </div>
+                        <div style="font-family: monospace; background: var(--bg-surface); padding: 0.45rem 0.75rem; border-radius: 4px; border: 1px solid var(--bg-border); font-size: 0.85rem; word-break: break-all; margin-top: 0.25rem;">
+                            ${r.profile_token}
+                        </div>
+                    </div>
+
+                    <div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">
+                            ${r.firmware_token_name} ${r.firmware_cached ? '<span style="color: #f59e0b;">(Cached)</span>' : '<span style="color: #10b981;">(New)</span>'}:
+                        </div>
+                        <div style="font-family: monospace; background: var(--bg-surface); padding: 0.45rem 0.75rem; border-radius: 4px; border: 1px solid var(--bg-border); font-size: 0.85rem; word-break: break-all; margin-top: 0.25rem;">
+                            ${r.firmware_token}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+</script>
+{% endblock %}

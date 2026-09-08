@@ -1,0 +1,86 @@
+APEX STANDARD,,,,,
+End User Configuration Form,,,,,Card Details
+Config Name,STND,,,,Card Type
+Config ID,322,,,,Bitstream
+STEP 1: Hardware,,,,,Facility Code
+Wiegand/OSDP,ET10,ET20,ET25,,Starting Badge
+-2WS,No,No,No,,Notes
+-3WS,No,No,No,,
+-6WS,Yes,Yes,Yes,,
+-7WS,Yes,Yes,Yes,,
+,,,,,
+F2F,ET10,ET20,ET25,,Part Numbers
+-7FM,No,No,No,,
+,,,,,
+MCLP,ET10,ET20,ET25,,
+-7FM,No,No,No,,Notes/Other Products
+,,,,,"APEX Standard matches the HID 00 Signo standard. We will enable people to do whatever they want, then as they get more secure they can update the reader to be better via Configure and an educational one pager. 
+
+
+NOTE: After further testing with Kris/Nate/Jacob, it was found that wallet behaves oddly on APEX with CSNs enabled. While they are able to work together, having CSNs on causes wallet to read slower and occasionally pull up a credit card instead of your credential. This is something we may be able to fix in the future, but Kris would need time to research and implement a solution. 
+
+
+"
+STEP 2: Custom Keyset,,,,,
+Custom Keyset (LEAF Cc),,Disabled,,,
+Keyset ID (LkXXXXX),,,,,
+LEAF Customer Code (Decimal),,,,,
+STEP 3: AV + Output Formats,,,,,
+Wiegand/OSDP,,,,,
+Idle LED,,Red,,,
+Credential Report LED,,Green,,,
+Beeper,,On,,,
+Keypad Format,,8-bit,,,
+Tamper Monitoring,,On,,,
+F2F,,,,,
+Casi Output Format,,CASI-4002,,,
+Supervision State,,2-State,,,
+Tamper Monitoring,,On,,,
+STEP 4: High Frequency (HF),,,,,
+Leaf Si Application (Kv1),,Leaf Si,,,
+Leaf Cc Application (Kc1),,None,,,
+Other Custom HF Application,,None,,,
+"Custom
+Application
+Notes","Kv2 of Lk00001
+Plus Dormakaba",,,,
+,,,,,
+,,,,,
+STEP 5: Card Serial Number (CSN),,,,,
+MFC CSN,,On,CSN_32_BIT_MSB,,
+EV1/EV2 CSN,,On,CSN_32_BIT_MSB,,
+iClass CSN,,On,CSN_32_BIT_MSB,,
+ISO15693 CSN,,On,CSN_32_BIT_MSB,,
+ISO14443A CSN,,On,,,
+STEP 6: Low Frequency (LF),,,,,
+FSK Prox,,On,,,
+ASK Prox,,On,,,
+Prox Filter,,,,,
+Prox Filter,,On,,,
+"Prox
+Filter
+Description","Ignores W37-1 prox with BID greater than or equal to 25,769,803,776",,,,
+,,,,,
+,,,,,
+STEP 7: Mobile,,,,,
+BLE Advertising Config,,Unique (Differs),,,
+BLE Functionality,,Admin + Credentials,,,
+NFC Functionality,,Enabled,,,
+Mobile Keyset,,WaveLynx Transport,,,
+"Legacy Credentials (Sym Blue, Brivo)",,Off,,,
+Transport Mode,,Off,,,
+ECP DESFire,,Enabled,,,
+ECP TCI,,020900,,,
+Apple Meridian Bit Count,,40,,,
+MiFare2Go,,Enabled,,,
+MiFare2Go DFNAME,,A00000039656434103F532F000020900,,,
+Mobile Notes,"Lk00001 wallet profile.
+
+    ""id"": ""Lk00001"",
+    ""tci"": ""020900"",
+    ""dfname"": ""A00000039656434103F532F000020900""
+
+PLUS myPass",,,,
+STEP 8: Part Numbers,,,,,
+"Assigned 
+Part Numbers",,,,,

@@ -1,0 +1,61 @@
+,,,,,,
+End User Configuration Form,,,,,Card Details,
+Config Name,CSP1,,,,Card Type,50D8
+Config ID,47,,,,
+STEP 1: Hardware,,,,,Bitstream,W35-0
+Wiegand/OSDP,ET10,ET20,ET25,,Facility Code,300
+-2WS,No,No,No,,Starting Badge,"710,000"
+-3WS,Yes,Yes,Yes,,Notes,
+-6WS,No,No,No,,"Old FC: 484, 866
+
+New FC: 300",
+-7WS,Yes,Yes,Yes,,,
+,,,,,,
+F2F,ET10,ET20,ET25,,,
+-7FM,No,No,No,,Part Numbers,
+,,,,,50M8-Lk10035,
+MCLP,ET10,ET20,ET25,,,
+-7FM,No,No,No,,,
+,,,,,Notes/Other Products,
+STEP 2: AV + Output Formats,,,,,,
+Wiegand/OSDP,,,,,,
+Idle LED,,Red,,,,
+Credential Report LED,,Green,,,,
+Beeper,,On,,,,
+Keypad Format,,8-bit,,,,
+Tamper Monitoring,,On,,,,
+F2F,,,,,,
+Casi Output Format,,CASI-4002,,,,
+Supervision State,,2-State,,,,
+Tamper Monitoring,,On,,,,
+STEP 3: HF,,,,,,
+Leaf Application,,Leaf CC,,,,
+Other Custom HF Application,,None,,,,
+"Custom
+Application
+Notes",Lk10035,,,,,
+,,,,,,
+,,,,,,
+STEP 4: CSN,,,,,,
+MFC CSN,,Off,,,,
+EV1/EV2 CSN,,Off,,,,
+iClass CSN,,Off,,,,
+ISO15693 CSN,,Off,,,,
+ISO14443A CSN,,Off,,,,
+STEP 5: LF,,,,,,
+FSK Prox,,On,,,,
+ASK Prox,,On,,,,
+Prox Filter,,,,,,
+Prox Filter,,On,,,,
+"Prox
+Filter
+Description",Filter all W35-0 prox credentials with facilitiy code 300,,,,,
+,,,,,,
+,,,,,,
+STEP 6: BLE,,,,,,
+BLE Functionality,,Admin Only,,,,
+STEP 7: NFC,,,,,,
+NFC Functionality,,Disabled,,,,
+STEP 8: Part Numbers,,,,,,
+"Assigned 
+Part Numbers",ETxx-xWS-CSP1-Lk10035,,,,,

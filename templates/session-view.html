@@ -1,0 +1,138 @@
+<!-- Test Session Detail View Template -->
+{% extends 'base.html' %}
+{% block title %}{{ session.title }} | Caliga{% endblock %}
+
+{% block content %}
+<div style="padding: 1rem 0;">
+    <!-- Navigation Link -->
+    <a href="/testing/version/{{ session.version }}" style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem;">  Back to {{ session.version }} Workspace</a>
+
+    <!-- Session Header with Metrics -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin: 1rem 0 1.5rem 0;">
+        <div>
+            <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                <h1 style="font-size: 1.75rem; font-weight: 700; margin: 0;">{{ session.title }}</h1>
+                
+                <!-- Status Counter Badges -->
+                <div style="display: flex; gap: 0.4rem; align-items: center;">
+                    <span class="count-badge badge-passed">
+                        {{ session_stats.passed }} Passed
+                    </span>
+                    <span class="count-badge badge-failed">
+                        {{ session_stats.failed }} Failed
+                    </span>
+                    <span class="count-badge badge-pending">
+                        {{ session_stats.pending }} Pending
+                    </span>
+                </div>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.35rem;">Target Firmware: <strong>{{ session.version }}</strong> | Created: {{ session.created_at }}</p>
+        </div>
+    </div>
+
+    <!-- Configuration Test Case List -->
+    <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+        {% for filename, case in session.configs.items() %}
+        <div style="background: var(--bg-surface); border: 1px solid var(--bg-border); border-radius: 8px; padding: 1.1rem 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+            
+            <div style="display: flex; align-items: center; gap: 1.25rem;">
+                <span style="font-weight: 700; font-size: 1.1rem; color: var(--accent-primary);">{{ case.config_name }}</span>
+                <span class="status-badge status-{{ case.status | lower }}">
+                    {{ case.status }}
+                </span>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <select onchange="updateAssignee('{{ filename }}', this.value)" style="background: var(--bg-primary); border: 1px solid var(--bg-border); color: var(--text-main); padding: 0.45rem 0.75rem; border-radius: 6px; font-size: 0.85rem;">
+                    {% for member in team_members %}
+                        <option value="{{ member }}" {% if member == case.assigned_to %}selected{% endif %}>Assigned: {{ member }}</option>
+                    {% endfor %}
+                </select>
+
+                <a href="/testing/version/{{ session.version }}/session/{{ session.session_id }}/run/{{ filename }}" style="background: var(--accent-primary); color: white; padding: 0.45rem 1.1rem; border-radius: 6px; text-decoration: none; font-size: 0.875rem; font-weight: 600;">
+                    Execute / Resume Test ↗
+                </a>
+            </div>
+
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Component Badges & Status Styles -->
+<style>
+.count-badge {
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.25rem 0.65rem;
+    border-radius: 6px;
+    border: 1px solid var(--bg-border);
+}
+
+.badge-passed {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+.badge-failed {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+.badge-pending {
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+    border-color: rgba(245, 158, 11, 0.3);
+}
+
+.status-badge {
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    background: var(--bg-surface);
+    color: var(--text-muted);
+}
+
+.status-badge.status-pass {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+}
+
+.status-badge.status-fail {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+}
+
+.status-badge.status-in_progress {
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+}
+
+.status-badge.status-untested {
+    background: var(--bg-primary);
+    color: var(--text-muted);
+}
+</style>
+
+<!-- Component Controller Script -->
+<script>
+const VERSION = "{{ session.version }}";
+const SESSION_ID = "{{ session.session_id }}";
+
+function updateAssignee(filename, assignee) {
+    fetch('/testing/api/update-assignee', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            version: VERSION,
+            session_id: SESSION_ID,
+            filename: filename,
+            assigned_to: assignee
+        })
+    });
+}
+</script>
+{% endblock %}

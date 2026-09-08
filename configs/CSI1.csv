@@ -1,0 +1,72 @@
+Sicunet,,,,,
+End User Configuration Form,,,,,Card Details
+Config Name,LCT1-CSI1,,,,Card Type
+Config ID,51,,,,
+STEP 1: Hardware,,,,,Bitstream
+Wiegand/OSDP,ET10,ET20,ET25,,Facility Code
+-2WS,No,No,No,,Starting Badge
+-3WS,No,No,No,,Notes
+-6WS,No,No,No,,"ET10-6WS: CAE-ET5
+ET10-7WS: CAE-ET10
+ET20-7WS: CAE-ET20
+ET25-7WS: CAE-ET25
+"
+-7WS,Yes,Yes,Yes,,
+,,,,,
+F2F,ET10,ET20,ET25,,
+-7FM,No,No,No,,Part Numbers
+,,,,,
+MCLP,ET10,ET20,ET25,,
+-7FM,No,No,No,,
+,,,,,Notes/Other Products
+STEP 2: AV + Output Formats,,,,,"Continental is a sub-OEM for Sicunet.  The actual configuration is the same as Sicunet, but the packaging / labels / PN are custom"
+Wiegand/OSDP,,,,,
+Idle LED,,Red,,,
+Credential Report LED,,Green,,,
+Beeper,,On,,,
+Keypad Format,,8-bit,,,
+Tamper Monitoring,,On,,,
+F2F,,,,,
+Casi Output Format,,CASI-4002,,,
+Supervision State,,2-State,,,
+Tamper Monitoring,,On,,,
+STEP 3: HF,,,,,
+Leaf Application,,Leaf Si,,,
+Other Custom HF Application,,None,,,
+"Custom
+Application
+Notes",,,,,
+,,,,,
+,,,,,
+STEP 4: CSN,,,,,
+MFC CSN,,On,,,
+EV1/EV2 CSN,,On,,,
+iClass CSN,,On,,,
+ISO15693 CSN,,On,,,
+ISO14443A CSN,,On,,,
+STEP 5: LF,,,,,
+FSK Prox,,On,,,
+ASK Prox,,On,,,
+Prox Filter,,,,,
+Prox Filter,,Off,,,
+"Prox
+Filter
+Description",,,,,
+,,,,,
+,,,,,
+STEP 6: Mobile,,,,,
+BLE Advertising Config,,WaveLynx,,,
+BLE Functionality,,Admin + MyPass,,,
+NFC Functionality,,MyPass,,,
+Mobile Keyset,,Custom,,,
+Legacy Credentials (Symmetry Blue),,Off,,,
+Transport Mode,,Off,,,
+Mobile Notes,,"Sicunet custom mobile keyset loaded from the factory
+
+Mk50002",,,
+STEP 8: Part Numbers,,,,,
+"Assigned 
+Part Numbers","ET10-6WS-LCT1-CSI1: CAE-ET5
+ET10-7WS-LCT1-CSI1: CAE-ET10
+ET20-7WS-LCT1-CSI1: CAE-ET20
+ET25-7WS-LCT1-CSI1: CAE-ET25",,,,

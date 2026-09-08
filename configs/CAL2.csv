@@ -1,0 +1,79 @@
+Alarm.com,,,,,
+End User Configuration Form,,,,,Card Details
+Config Name,CAL2,,,,Card Type
+Config ID,172,,,,Bitstream
+STEP 1: Hardware,,,,,Facility Code
+Wiegand/OSDP,ET10,ET20,ET25,,Starting Badge
+-2WS,No,No,No,,Notes
+-3WS,No,No,No,,
+-6WS,No,No,No,,
+-7WS,Yes,Yes,Yes,,
+,,,,,
+F2F,ET10,ET20,ET25,,Part Numbers
+-7FM,No,No,No,,
+,,,,,
+MCLP,ET10,ET20,ET25,,
+-7FM,No,No,No,,Notes/Other Products
+,,,,,"- Secure File transfer using Alarm.com specific files (custom key) (Available in future FW) 
+
+- Custom keyset for Mobile Access (Mk50008) 
+
+- OEM-key Desfire enabled (Kc1 of Lk50008) and standard WaveLynx MFG key (Ks1 of Lk00001) 
+
+- iClass and ISO15693 reported as 56-bit output (Least significant 7 bytes of CSN Most significant byte of CSN is truncated)"
+STEP 2: Custom Keyset,,,,,
+Custom Keyset (LEAF Cc),,Enabled,,,
+Keyset ID (LkXXXXX),,Lk50008,,,
+LEAF Customer Code (Decimal),,56,,,
+STEP 3: AV + Output Formats,,,,,
+Wiegand/OSDP,,,,,
+Idle LED,,Red,,,
+Credential Report LED,,Green,,,
+Beeper,,On,,,
+Keypad Format,,4-bit,,,
+Tamper Monitoring,,On,,,
+F2F,,,,,
+Casi Output Format,,CASI-4002,,,
+Supervision State,,2-State,,,
+Tamper Monitoring,,On,,,
+STEP 4: High Frequency (HF),,,,,
+Leaf Si Application (Kv1),,Leaf Si,,,
+Leaf Cc Application (Kc1),,Leaf Cc,,,
+Other Custom HF Application,,None,,,
+"Custom
+Application
+Notes",KC1 of LK50008 and Ks1 of LK00001,,,,
+,,,,,
+,,,,,
+STEP 5: Card Serial Number (CSN),,,,,
+MFC CSN,,On,Standard,,
+EV1/EV2 CSN,,On,Standard,,
+iClass CSN,,On,Standard,,
+ISO15693 CSN,,On,Standard,,
+ISO14443A CSN,,On,,,
+STEP 6: Low Frequency (LF),,,,,
+FSK Prox,,On,,,
+ASK Prox,,On,,,
+Prox Filter,,,,,
+Prox Filter,,On,,,
+"Prox
+Filter
+Description","Ignore all low frequency credentials with W36-8 format, FAC = 7",,,,
+,,,,,
+,,,,,
+STEP 7: Mobile,,,,,
+BLE Advertising Config,,Unique (Differs),,,
+BLE Functionality,,Admin + Credentials,,,
+NFC Functionality,,Enabled,,,
+Mobile Keyset,,Custom,,,
+"Legacy Credentials (Sym Blue, Brivo)",,Off,,,
+Transport Mode,,Off,,,
+ECP DESFire,,Disabled,,,
+ECP TCI,,,,,
+Apple Meridian Bit Count,,,,,
+MiFare2Go,,Disabled,,,
+MiFare2Go DFNAME,,,,,
+Mobile Notes,,,,,
+STEP 8: Part Numbers,,,,,
+"Assigned 
+Part Numbers",ADC-AC-ETXX-1,,,,

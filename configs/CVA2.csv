@@ -1,0 +1,111 @@
+Visa,,,,,,
+End User Configuration Form,,,,,Card Details,
+Config Name,CVA2-Lk10074,,,,Card Type,
+Config ID,98,,,,Bitstream,W45-0
+STEP 1: Hardware,,,,,Facility Code,538
+Wiegand/OSDP,ET10,ET20,ET25,,Starting Badge,"10,000,026"
+-2WS,No,No,No,,Notes,
+-3WS,No,No,No,,"Physical credentials use W45-0 format
+
+Wallet will use W40-2
+- Wallet credential holders BID: 20,000,000 to 29,999,999
+- Wallet visiter credentials BID: 500,000,000 to 599,999,999",
+-6WS,Yes,Yes,Yes,,,
+-7WS,No,No,No,,,
+,,,,,,
+F2F,ET10,ET20,ET25,,Part Numbers,
+-7FM,No,No,No,,50L8-Lk10074,
+,,,,,,
+MCLP,ET10,ET20,ET25,,,
+-7FM,No,No,No,,Notes/Other Products,
+,,,,,"- Wallet Enabled
+- Custom MiFare Classic Key 
+   (See Custom Application Notes box)
+- Custom LEAF Cc key
+
+VISA MFC App Notes:
+The VISA MFC app resides in Sector 9 and the authentication key is not diversified. (Sector = 9, Diversification Disabled).
+This is configured by setting the least significant 10 bits of the MFC_APP_INDEX configuration word to the value 0x009.
+
+More Helpful Hints:
+#define CT_MF_CLASSIC         3
+#define CA_VISA_MFC_APP       6
+
+SystemFeatures.CardTypesApps[CT_MF_CLASSIC][0] = CA_VISA_MFC_APP;
+
+// VISA Sector = 9, Diversification Disabled
+SystemFeatures.OpSettings[MFC_APP_INDEX] = 0x0009;
+
+#define MFC_APP_INDEX                55
+#define MFC_APP_SECTOR_MASK          0x00FF
+#define MFC_KEY_DIV_MASK             BIT8
+#define MFC_USE_KEY_B_MASK           BIT9
+
+START at bit 0, read length of 10 
+",
+STEP 2: Custom Keyset,,,,,,
+Custom Keyset (LEAF Cc),,Enabled,,,,
+Keyset ID (LkXXXXX),,Lk10074,,,,
+LEAF Customer Code (Decimal),,101,,,,
+STEP 3: AV + Output Formats,,,,,,
+Wiegand/OSDP,,,,,,
+Idle LED,,Red,,,,
+Credential Report LED,,Green,,,,
+Beeper,,On,,,,
+Keypad Format,,8-bit,,,,
+Tamper Monitoring,,On,,,,
+F2F,,,,,,
+Casi Output Format,,CASI-4002,,,,
+Supervision State,,2-State,,,,
+Tamper Monitoring,,On,,,,
+STEP 4: High Frequency (HF),,,,,,
+Leaf Si Application (Kv1),,None,,,,
+Leaf Cc Application (Kc1),,Leaf Cc,,,,
+Other Custom HF Application,,Custom MFC,,,,
+"Custom
+Application
+Notes","The Lk10074_Kc1 key is the ""DESFire Key"" supplied by VISA.
+VISA has tracked a DESFire key pair (Auth and OCPSK) for a future 
+DESFire app that never got designed or implemented. So, the DESFire 
+auth key has been re-assigned to Leaf Kc1. The OCPSK key given to us can be ignored since Leaf cannot use it.
+
+The MFC key VISA supplied us can be extracted from Sequoia using 
+this tool command: getkeyset visa 
+This MFC key should be loaded into the BLE_MFC_KEYSET (4) reader 
+keyset slot with the key offset set to KEY2_OFFSET_AES128 (byte 16).
+
+See Mike Malone to answer any further questions.",,,,,
+,,,,,,
+,,,,,,
+STEP 5: Card Serial Number (CSN),,,,,,
+MFC CSN,,Off,CSN_32_BIT_MSB,,,
+EV1/EV2 CSN,,Off,CSN_32_BIT_MSB,,,
+iClass CSN,,Off,CSN_32_BIT_MSB,,,
+ISO15693 CSN,,Off,CSN_32_BIT_MSB,,,
+ISO14443A CSN,,Off,,,,
+STEP 6: Low Frequency (LF),,,,,,
+FSK Prox,,On,,,,
+ASK Prox,,On,,,,
+Prox Filter,,,,,,
+Prox Filter,,Off,,,,
+"Prox
+Filter
+Description",,,,,,
+,,,,,,
+,,,,,,
+STEP 7: Mobile,,,,,,
+BLE Advertising Config,,Unique (Differs),,,,
+BLE Functionality,,Admin Only,,,,
+NFC Functionality,,Enabled,,,,
+Mobile Keyset,,Custom,,,,
+"Legacy Credentials (Sym Blue, Brivo)",,Off,,,,
+Transport Mode,,Off,,,,
+ECP DESFire,,Enabled,,,,
+ECP TCI,,02094b,,,,
+Apple Meridian Bit Count,,40,,,,
+MiFare2Go,,Enabled,,,,
+MiFare2Go DFNAME,,A00000039656434103F532F00002094b,,,,
+Mobile Notes,,,,,,
+STEP 8: Part Numbers,,,,,,
+"Assigned 
+Part Numbers",ETXX-6WS-CVA2-Lk10074,,,,,

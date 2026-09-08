@@ -1,0 +1,76 @@
+TIAA,,,,,,
+End User Configuration Form,,,,,Card Details,
+Config Name,CTI1-LK10021,,,,Card Type,Dual-Tech LeafCc + Prox
+Config ID,33,,,,
+STEP 1: Hardware,,,,,Bitstream,W35-0
+Wiegand/OSDP,ET10,ET20,ET25,,Facility Code,313
+-2WS,No,No,No,,Starting Badge,"400,001"
+-3WS,No,No,No,,Notes,
+-6WS,No,No,No,,,
+-7WS,Yes,Yes,Yes,,,
+,,,,,,
+F2F,ET10,ET20,ET25,,,
+-7FM,No,No,No,,Part Numbers,
+,,,,,50d8-Lk10021,
+MCLP,ET10,ET20,ET25,,,
+-7FM,No,No,No,,,
+,,,,,Notes/Other Products,
+STEP 2: AV + Output Formats,,,,,"INSTRUCTIONS FROM LAURIE
+
+Migrate to Dual tech cards with same data on both sides
+Use Corporate 1000 format - 35 bits with FC = 313
+Start Dual Tech cards at badge ID 400,001
+Prox Filter 35 bit format with badge ID >400,000
+
+For the reader we want to ship Tony an updated config file with the prox filter so he can also test his OSDP download capability. Please notify me when samples are shipped.",
+Wiegand/OSDP,,,,,,
+Idle LED,,Red,,,,
+Credential Report LED,,Green,,,,
+Beeper,,On,,,,
+Keypad Format,,8-bit,,,,
+Tamper Monitoring,,On,,,,
+F2F,,,,,,
+Casi Output Format,,CASI-4002,,,,
+Supervision State,,2-State,,,,
+Tamper Monitoring,,On,,,,
+STEP 3: HF,,,,,,
+Leaf Application,,Leaf CC,,,,
+Other Custom HF Application,,None,,,,
+"Custom
+Application
+Notes",Lk10021,,,,,
+,,,,,,
+,,,,,,
+STEP 4: CSN,,,,,,
+MFC CSN,,Off,,,,
+EV1/EV2 CSN,,Off,,,,
+iClass CSN,,Off,,,,
+ISO15693 CSN,,Off,,,,
+ISO14443A CSN,,Off,,,,
+STEP 5: LF,,,,,,
+FSK Prox,,On,,,,
+ASK Prox,,On,,,,
+Prox Filter,,,,,,
+Prox Filter,,On,,,,
+"Prox
+Filter
+Description","Filter W35-0 BID ≥ 400,000",,,,,
+,,,,,,
+,,,,,,
+STEP 6: Mobile,,,,,,
+BLE Advertising Config,,WaveLynx,,,,
+BLE Functionality,,Admin Only,,,,
+NFC Functionality,,Disabled,,,,
+Mobile Keyset,,WaveLynx Transport,,,,
+Legacy Credentials (Symmetry Blue),,Off,,,,
+Transport Mode,,On,,,,
+Mobile Notes,,,,,,
+STEP 7: Part Numbers,,,,,,
+"Assigned 
+Part Numbers",ETXX-7WS-CTI1-Lk10021,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+Updated doc for 2.4.2.0 MyPass behavior (MyPass disabled) 8/11/2020,,,,,,

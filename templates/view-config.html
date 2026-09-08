@@ -1,0 +1,1072 @@
+<!-- Configuration Detail & Profile Viewer Template -->
+{% extends 'base.html' %}
+
+{% block title %}{{ config.config_name }} Profile | Caliga{% endblock %}
+
+{% block content %}
+<div style="padding: 1rem 0;">
+    <!-- Navigation Back Link -->
+    <a href="/configs" style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem;">← Back to all configurations</a>
+
+    <!-- Header Actions & Operations Toolbar -->
+    <div style="background: var(--bg-surface); border: 1px solid var(--bg-border); border-radius: 8px; padding: 1.5rem; margin: 1rem 0 1.5rem 0;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <h1 style="font-size: 1.75rem; font-weight: 700;">File: {{ config.config_name }}</h1>
+                <span style="background: var(--bg-primary); border: 1px solid var(--bg-border); color: var(--accent-primary); padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.85rem; font-weight: 600;">
+                    {{ config.status.value }}
+                </span>
+                <span style="font-family: monospace; color: var(--text-muted); font-size: 0.9rem;">
+                    ID: {{ config.config_id_dec }} ({{ config.config_id_hex }})
+                </span>
+            </div>
+
+            <!-- Firmware Target Selector -->
+            <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem;">
+                <span style="color: var(--text-muted);">Target Version:</span>
+                <select id="target-version" style="background: var(--bg-primary); border: 1px solid var(--bg-border); color: var(--text-main); padding: 0.4rem 0.75rem; border-radius: 6px;">
+                    {% for i in range(11, 5, -1) %}
+                        <option value="v5.4.{{ i }}">v5.4.{{ i }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <!-- Action Control Buttons -->
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+            <button id="generateIniBtn" class="action-btn" onclick="generateIni()">
+                <span id="iniBtnSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true" style="width: 0.85rem; height: 0.85rem; border-width: 0.15em;"></span>
+                <span id="iniBtnText">Generate INI</span>
+            </button>
+            <button id="generateBinBtn" class="action-btn" onclick="generateProfileBin()">
+                <span id="binBtnSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true" style="width: 0.85rem; height: 0.85rem; border-width: 0.15em;"></span>
+                <span id="binBtnText">Generate Profile BIN</span>
+            </button>
+            <button id="generateFirmwareBtn" class="action-btn" onclick="generateFirmwareDck()">
+                <span id="firmwareBtnSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true" style="width: 0.85rem; height: 0.85rem; border-width: 0.15em;"></span>
+                <span id="firmwareBtnText">Generate Firmware DCK</span>
+            </button>
+            <button id="generateTokensBtn" class="action-btn" onclick="generateTokens()">
+                <span id="tokensBtnSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true" style="width: 0.85rem; height: 0.85rem; border-width: 0.15em;"></span>
+                <span id="tokensBtnText">Generate Tokens</span>
+            </button>
+            
+            <!-- Wallet Pass Actions (Rendered conditionally for MiFare2Go) -->
+            {% if config.mobile.mifare2go_enabled and config.mobile.mifare2go_enabled.lower() == 'enabled' %}
+            <button id="genProdQrBtn" class="action-btn" onclick="generateWalletQr('production')">
+                <span id="prodQrSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true" style="width: 0.85rem; height: 0.85rem; border-width: 0.15em;"></span>
+                <span id="prodQrBtnText">Generate Production Wallet QR</span>
+            </button>
+            <button id="genStagingQrBtn" class="action-btn" onclick="generateWalletQr('staging')">
+                <span id="stagingQrSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true" style="width: 0.85rem; height: 0.85rem; border-width: 0.15em;"></span>
+                <span id="stagingQrBtnText">Generate Staging Wallet QR</span>
+            </button>
+            {% endif %}
+
+            <button id="flashBinBtn" class="action-btn" onclick="flashProfileBin()">
+                <span id="flashBinBtnSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true" style="width: 0.85rem; height: 0.85rem; border-width: 0.15em;"></span>
+                <span id="flashBinBtnText">Flash Profile BIN</span>
+            </button>
+            <button id="flashFirmwareBtn" class="action-btn" onclick="flashFirmwareDck()">
+                <span id="flashFirmwareBtnSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true" style="width: 0.85rem; height: 0.85rem; border-width: 0.15em;"></span>
+                <span id="flashFirmwareBtnText">Flash Firmware DCK</span>
+            </button>
+
+            <!-- OSDP Serial Port Selection -->
+            <div class="port-picker-container mb-3">
+                <span class="port-picker-label">Serial / RS-485 Port:</span>
+                <select id="osdp-port-select" class="port-select-dark">
+                    <option value="">Scanning ports...</option>
+                </select>
+                <button class="btn-port-refresh" type="button" onclick="loadOsdpPorts()" title="Refresh Ports">
+                    &#8635;
+                </button>
+            </div>
+        </div>
+
+        <!-- Wallet QR Output Display Card -->
+        <div id="walletQrContainer" class="d-none" style="margin-top: 1rem; padding: 1.25rem; background: var(--bg-primary); border: 1px solid var(--bg-border); border-radius: 6px; text-align: center;">
+            <h3 style="font-size: 0.95rem; font-weight: 700; color: var(--accent-primary); margin-bottom: 0.5rem;" id="walletQrTitle">WALLET QR CODE</h3>
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;" id="walletQrSub"></div>
+            
+            <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 1rem;">
+                <img id="walletQrImg" src="" alt="Wallet QR Code" style="max-width: 240px; border-radius: 8px; border: 4px solid #ffffff; box-shadow: 0 4px 12px rgba(0,0,0,0.3);" />
+            </div>
+        </div>
+
+        <!-- Token Registry Output Container -->
+        <div id="tokensContainer" class="d-none" style="margin-top: 1rem; padding: 1rem; background: var(--bg-primary); border: 1px solid var(--bg-border); border-radius: 6px;">
+            <h3 style="font-size: 0.95rem; font-weight: 700; color: var(--accent-primary); margin-bottom: 0.75rem;">GENERATED POCKETBASE TOKENS</h3>
+            
+            <div style="margin-bottom: 0.75rem;">
+                <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;" id="profileTokenLabel"></div>
+                <div style="font-family: monospace; background: var(--bg-surface); padding: 0.5rem 0.75rem; border-radius: 4px; border: 1px solid var(--bg-border); font-size: 0.85rem; word-break: break-all;" id="profileTokenVal"></div>
+            </div>
+
+            <div>
+                <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;" id="firmwareTokenLabel"></div>
+                <div style="font-family: monospace; background: var(--bg-surface); padding: 0.5rem 0.75rem; border-radius: 4px; border: 1px solid var(--bg-border); font-size: 0.85rem; word-break: break-all;" id="firmwareTokenVal"></div>
+            </div>
+        </div>
+
+        <!-- Alert Error Banner -->
+        <div id="iniErrorAlert" class="ini-error-banner d-none">
+            <span style="font-weight: 600; color: #f87171;">Error:</span>
+            <span id="iniErrorMessage" style="margin-left: 0.35rem;"></span>
+        </div>
+
+        <!-- Read-Only Mode Banner -->
+        {% if config.status.value == 'Active' %}
+        <div style="margin-top: 1rem; padding: 0.75rem 1rem; background: rgba(245, 158, 11, 0.1); border: 1px solid var(--accent-warning); color: var(--accent-warning); border-radius: 6px; font-size: 0.85rem;">
+            <strong>Read-Only Mode:</strong> This configuration is in <strong>Active</strong> status and locked. Change status to <strong>POC</strong> to make edits.
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- REVISION HISTORY SECTION -->
+    <div style="background: var(--bg-surface); border: 1px solid var(--bg-border); border-radius: 8px; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem;">
+        <div style="margin-bottom: 1rem;">
+            <h2 style="font-size: 0.95rem; font-weight: 700; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.05em;">REVISION HISTORY</h2>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            {% for rev in revisions %}
+            <div style="background: var(--bg-primary); border: 1px solid var(--bg-border); border-radius: 6px; padding: 0.85rem 1rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                    <span style="font-weight: 600; font-size: 0.875rem; color: var(--accent-primary);">Revision #{{ rev.revision_number }}</span>
+                    <span style="font-size: 0.775rem; color: var(--text-muted); font-family: monospace;">{{ rev.timestamp }}</span>
+                </div>
+                <p style="font-size: 0.85rem; color: var(--text-main); margin: 0; white-space: pre-line; line-height: 1.5;">{{ rev.summary }}</p>
+            </div>
+            {% else %}
+            <span style="color: var(--text-muted); font-size: 0.85rem;">No revision history recorded.</span>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- 8 Step Sections -->
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+        
+        <!-- STEP 1: Hardware Support -->
+        <div style="background: var(--bg-surface); border: 1px solid var(--bg-border); border-radius: 8px; padding: 1.5rem;">
+            <h2 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; color: var(--accent-primary);">STEP 1: Hardware Support</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
+                <div>
+                    <label class="field-label">Wiegand/OSDP -2WS</label>
+                    <select name="wiegand_2ws" {% if config.status.value != 'POC' %}disabled{% endif %} class="field-input">
+                        {% for opt in dropdowns.yes_no %}
+                        <option value="{{ opt }}" {% if (config.hardware.wiegand_2ws and opt == 'Yes') or (not config.hardware.wiegand_2ws and opt == 'No') %}selected{% endif %}>{{ opt }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="field-label">Wiegand/OSDP -3WS</label>
+                    <select name="wiegand_3ws" {% if config.status.value != 'POC' %}disabled{% endif %} class="field-input">
+                        {% for opt in dropdowns.yes_no %}
+                        <option value="{{ opt }}" {% if (config.hardware.wiegand_3ws and opt == 'Yes') or (not config.hardware.wiegand_3ws and opt == 'No') %}selected{% endif %}>{{ opt }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="field-label">Wiegand/OSDP -6WS</label>
+                    <select name="wiegand_6ws" {% if config.status.value != 'POC' %}disabled{% endif %} class="field-input">
+                        {% for opt in dropdowns.yes_no %}
+                        <option value="{{ opt }}" {% if (config.hardware.wiegand_6ws and opt == 'Yes') or (not config.hardware.wiegand_6ws and opt == 'No') %}selected{% endif %}>{{ opt }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="field-label">Wiegand/OSDP -7WS</label>
+                    <select name="wiegand_7ws" {% if config.status.value != 'POC' %}disabled{% endif %} class="field-input">
+                        {% for opt in dropdowns.yes_no %}
+                        <option value="{{ opt }}" {% if (config.hardware.wiegand_7ws and opt == 'Yes') or (not config.hardware.wiegand_7ws and opt == 'No') %}selected{% endif %}>{{ opt }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="field-label">F2F -7FM</label>
+                    <select name="f2f_7fm" {% if config.status.value != 'POC' %}disabled{% endif %} class="field-input">
+                        {% for opt in dropdowns.yes_no %}
+                        <option value="{{ opt }}" {% if (config.hardware.f2f_7fm and opt == 'Yes') or (not config.hardware.f2f_7fm and opt == 'No') %}selected{% endif %}>{{ opt }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="field-label">MCLP -7FM</label>
+                    <select name="mclp_7fm" {% if config.status.value != 'POC' %}disabled{% endif %} class="field-input">
+                        {% for opt in dropdowns.yes_no %}
+                        <option value="{{ opt }}" {% if (config.hardware.mclp_7fm and opt == 'Yes') or (not config.hardware.mclp_7fm and opt == 'No') %}selected{% endif %}>{{ opt }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 2: Custom Keyset -->
+        <div style="background: var(--bg-surface); border: 1px solid var(--bg-border); border-radius: 8px; padding: 1.5rem;">
+            <h2 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; color: var(--accent-primary);">STEP 2: Custom Keyset</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
+                <div>
+                    <label class="field-label">Keyset ID (LkXXXXX)</label>
+                    <input type="text" name="keyset_id" value="{{ config.keyset_id }}" {% if config.status.value != 'POC' %}disabled{% endif %} class="field-input">
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 3: AV + Output Formats -->
+        <div style="background: var(--bg-surface); border: 1px solid var(--bg-border); border-radius: 8px; padding: 1.5rem;">
+            <h2 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; color: var(--accent-primary);">STEP 3: AV + Output Formats</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                <div>
+                    <label class="field-label">Idle LED Color</label>
+                    <select name="idle_led_color" {% if config.status.value != 'POC' %}disabled{% endif %} class="field-input">
+                        {% for opt in dropdowns.led_colors %}
+                        <option value="{{ opt }}" {% if config.audio_visual.idle_led_color.lower() == opt.lower() %}selected{% endif %}>{{ opt }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="field-label">Credential Report LED</label>
+                    <select name="credential_led_color" {% if config.status.value != 'POC' %}disabled{% endif %} class="field-input">
+                        {% for opt in dropdowns.led_colors %}
+                        <option value="{{ opt }}" {% if config.audio_visual.credential_led_color.lower() == opt.lower() %}selected{% endif %}>{{ opt }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="field-label">Beeper Status</label>
+                    <select name="beeper_enabled" {% if config.status.value != 'POC' %}disabled{% endif %} class="field-input">
+                        {% for opt in dropdowns.on_off %}
+                        <option value="{{ opt }}" {% if (config.audio_visual.beeper_enabled and opt == 'On') or (not config.audio_visual.beeper_enabled and opt == 'Off') %}selected{% endif %}>{{ opt }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="field-label">Keypad Format</label>
+                    <select name="keypad_format" {% if config.status.value != 'POC' %}disabled{% endif %} class="field-input">
+                        {% for opt in dropdowns.keypad_formats %}
+                        <option value="{{ opt }}" {% if config.audio_visual.keypad_format.lower() == opt.lower() %}selected{% endif %}>{{ opt }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="field-label">Tamper Monitoring</label>
+                    <select name="tamper_monitoring" {% if config.status.value != 'POC' %}disabled{% endif %} class="field-input">
+                        {% for opt in dropdowns.on_off %}
+                        <option value="{{ opt }}" {% if (config.audio_visual.tamper_monitoring and opt == 'On') or (not config.audio_visual.tamper_monitoring and opt == 'Off') %}selected{% endif %}>{{ opt }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 4: High Frequency (HF) -->
+        <div style="background: var(--bg-surface); border: 1px solid var(--bg-border); border-radius: 8px; padding: 1.5rem;">
+            <h2 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; color: var(--accent-primary);">STEP 4: High Frequency (HF)</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+                <div>
+                    <label class="field-label">LEAF Si Application (Kv1)</label>
+                    <select name="leaf_si_app" {% if config.status.value != 'POC' %}disabled{% endif %} class="field-input">
+                        {% for opt in dropdowns.leaf_si_apps %}
+                        <option value="{{ opt }}" {% if config.high_frequency.leaf_si_app.lower() == opt.lower() %}selected{% endif %}>{{ opt }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="field-label">LEAF Cc Application (Kc1)</label>
+                    <input type="text" name="leaf_cc_app" value="{{ config.high_frequency.leaf_cc_app }}" {% if config.status.value != 'POC' %}disabled{% endif %} placeholder="e.g. Leaf Cc or Lk10064" class="field-input">
+                </div>
+                <div>
+                    <label class="field-label">Other Custom HF Application</label>
+                    <input type="text" name="custom_hf_app" value="{{ config.high_frequency.custom_hf_app }}" {% if config.status.value != 'POC' %}disabled{% endif %} placeholder="None" class="field-input">
+                </div>
+            </div>
+            {% if config.high_frequency.notes %}
+            <div style="margin-top: 1rem;">
+                <label class="field-label">Custom Application Notes</label>
+                <input type="text" name="custom_application_notes" value="{{ config.high_frequency.notes }}" disabled class="field-input">
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- STEP 5: Card Serial Number (CSN) -->
+        <div style="background: var(--bg-surface); border: 1px solid var(--bg-border); border-radius: 8px; padding: 1.5rem;">
+            <h2 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; color: var(--accent-primary);">STEP 5: Card Serial Number (CSN)</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+                <div>
+                    <label class="field-label">MFC CSN</label>
+                    <select name="mfc_csn" {% if config.status.value != 'POC' %}disabled{% endif %} class="field-input">
+                        {% for opt in dropdowns.csn_formats %}
+                        <option value="{{ opt }}" {% if config.csn.mfc_csn.lower() == opt.lower() %}selected{% endif %}>{{ opt }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="field-label">EV1/EV2 CSN</label>
+                    <select name="ev1_ev2_csn" {% if config.status.value != 'POC' %}disabled{% endif %} class="field-input">
+                        {% for opt in dropdowns.csn_formats %}
+                        <option value="{{ opt }}" {% if config.csn.ev1_ev2_csn.lower() == opt.lower() %}selected{% endif %}>{{ opt }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="field-label">iClass CSN</label>
+                    <select name="iclass_csn" {% if config.status.value != 'POC' %}disabled{% endif %} class="field-input">
+                        {% for opt in dropdowns.csn_formats %}
+                        <option value="{{ opt }}" {% if config.csn.iclass_csn.lower() == opt.lower() %}selected{% endif %}>{{ opt }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="field-label">ISO15693 CSN</label>
+                    <select name="iso15693_csn" {% if config.status.value != 'POC' %}disabled{% endif %} class="field-input">
+                        {% for opt in dropdowns.csn_formats %}
+                        <option value="{{ opt }}" {% if config.csn.iso15693_csn.lower() == opt.lower() %}selected{% endif %}>{{ opt }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="field-label">ISO14443A CSN</label>
+                    <select name="iso14443a_csn" {% if config.status.value != 'POC' %}disabled{% endif %} class="field-input">
+                        {% for opt in dropdowns.csn_formats %}
+                        <option value="{{ opt }}" {% if config.csn.iso14443a_csn.lower() == opt.lower() %}selected{% endif %}>{{ opt }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 6: Low Frequency (LF) -->
+        <div style="background: var(--bg-surface); border: 1px solid var(--bg-border); border-radius: 8px; padding: 1.5rem;">
+            <h2 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; color: var(--accent-primary);">STEP 6: Low Frequency (LF)</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                <div>
+                    <label class="field-label">FSK Prox</label>
+                    <select name="fsk_prox" {% if config.status.value != 'POC' %}disabled{% endif %} class="field-input">
+                        {% for opt in dropdowns.on_off %}
+                        <option value="{{ opt }}" {% if (config.low_frequency.fsk_prox and opt == 'On') or (not config.low_frequency.fsk_prox and opt == 'Off') %}selected{% endif %}>{{ opt }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="field-label">ASK Prox</label>
+                    <select name="ask_prox" {% if config.status.value != 'POC' %}disabled{% endif %} class="field-input">
+                        {% for opt in dropdowns.on_off %}
+                        <option value="{{ opt }}" {% if (config.low_frequency.ask_prox and opt == 'On') or (not config.low_frequency.ask_prox and opt == 'Off') %}selected{% endif %}>{{ opt }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="field-label">Prox Filter</label>
+                    <select name="prox_filter_enabled" {% if config.status.value != 'POC' %}disabled{% endif %} class="field-input">
+                        {% for opt in dropdowns.on_off %}
+                        <option value="{{ opt }}" {% if (config.low_frequency.prox_filter_enabled and opt == 'On') or (not config.low_frequency.prox_filter_enabled and opt == 'Off') %}selected{% endif %}>{{ opt }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            {% if config.low_frequency.prox_filter_description %}
+            <div style="margin-top: 1rem;">
+                <label class="field-label">Prox Filter Description</label>
+                <input type="text" name="prox_filter_description" value="{{ config.low_frequency.prox_filter_description }}" disabled class="field-input">
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- STEP 7: Mobile Capabilities -->
+        <div style="background: var(--bg-surface); border: 1px solid var(--bg-border); border-radius: 8px; padding: 1.5rem;">
+            <h2 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; color: var(--accent-primary);">STEP 7: Mobile Capabilities</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
+                <div>
+                    <label class="field-label">BLE Advertising Config</label>
+                    <select name="ble_advertising" {% if config.status.value != 'POC' %}disabled{% endif %} class="field-input">
+                        {% for opt in dropdowns.ble_advertising %}
+                        <option value="{{ opt }}" {% if config.mobile.ble_advertising.lower() == opt.lower() %}selected{% endif %}>{{ opt }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="field-label">BLE Functionality</label>
+                    <select name="ble_functionality" {% if config.status.value != 'POC' %}disabled{% endif %} class="field-input">
+                        {% for opt in dropdowns.ble_functionality %}
+                        <option value="{{ opt }}" {% if config.mobile.ble_functionality.lower() == opt.lower() %}selected{% endif %}>{{ opt }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="field-label">NFC Functionality</label>
+                    <select name="nfc_functionality" {% if config.status.value != 'POC' %}disabled{% endif %} class="field-input">
+                        {% for opt in dropdowns.enabled_disabled %}
+                        <option value="{{ opt }}" {% if config.mobile.nfc_enabled.lower() == opt.lower() %}selected{% endif %}>{{ opt }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="field-label">Mobile Keyset</label>
+                    <select name="mobile_keyset" {% if config.status.value != 'POC' %}disabled{% endif %} class="field-input">
+                        {% for opt in dropdowns.mobile_keysets %}
+                        <option value="{{ opt }}" {% if config.mobile.mobile_keyset.lower() == opt.lower() %}selected{% endif %}>{{ opt }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="field-label">Legacy Credentials (Sym Blue, Brivo)</label>
+                    <select name="legacy_credentials" {% if config.status.value != 'POC' %}disabled{% endif %} class="field-input">
+                        {% for opt in dropdowns.on_off %}
+                        <option value="{{ opt }}" {% if config.mobile.legacy_credentials.lower() == opt.lower() %}selected{% endif %}>{{ opt }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="field-label">Transport Mode</label>
+                    <select name="transport_mode" {% if config.status.value != 'POC' %}disabled{% endif %} class="field-input">
+                        {% for opt in dropdowns.on_off %}
+                        <option value="{{ opt }}" {% if config.mobile.transport_mode.lower() == opt.lower() %}selected{% endif %}>{{ opt }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="field-label">ECP DESFire</label>
+                    <select name="ecp_desfire_enabled" {% if config.status.value != 'POC' %}disabled{% endif %} class="field-input">
+                        {% for opt in dropdowns.enabled_disabled %}
+                        <option value="{{ opt }}" {% if config.mobile.ecp_desfire_enabled.lower() == opt.lower() %}selected{% endif %}>{{ opt }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="field-label">ECP TCI</label>
+                    <input type="text" name="ecp_tci" value="{{ config.mobile.ecp_tci }}" {% if config.status.value != 'POC' %}disabled{% endif %} placeholder="e.g. 02098f" class="field-input">
+                </div>
+                <div>
+                    <label class="field-label">Apple Meridian Bit Count</label>
+                    <select name="apple_meridian_bit_count" {% if config.status.value != 'POC' %}disabled{% endif %} class="field-input">
+                        {% for opt in dropdowns.meridian_bit_counts %}
+                        <option value="{{ opt }}" {% if config.mobile.apple_meridian_bit_count.lower() == opt.lower() %}selected{% endif %}>{{ opt }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="field-label">MiFare2Go</label>
+                    <select name="mifare2go_enabled" {% if config.status.value != 'POC' %}disabled{% endif %} class="field-input">
+                        {% for opt in dropdowns.enabled_disabled %}
+                        <option value="{{ opt }}" {% if config.mobile.mifare2go_enabled.lower() == opt.lower() %}selected{% endif %}>{{ opt }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div style="grid-column: 1 / -1;">
+                    <label class="field-label">MiFare2Go DFNAME</label>
+                    <input type="text" name="mifare2go_dfname" value="{{ config.mobile.mifare2go_dfname }}" {% if config.status.value != 'POC' %}disabled{% endif %} placeholder="e.g. A00000039656434103F532F00002098f" class="field-input">
+                </div>
+            </div>
+            {% if config.mobile.mobile_notes %}
+            <div style="margin-top: 1rem;">
+                <label class="field-label">Mobile Notes</label>
+                <input type="text" name="mobile_notes" value="{{ config.mobile.mobile_notes }}" disabled class="field-input">
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- STEP 8: Part Numbers -->
+        <div style="background: var(--bg-surface); border: 1px solid var(--bg-border); border-radius: 8px; padding: 1.5rem;">
+            <h2 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; color: var(--accent-primary);">STEP 8: Assigned Part Numbers</h2>
+            {% for pn in config.assigned_part_numbers %}
+            <div style="font-family: monospace; background: var(--bg-primary); border: 1px solid var(--bg-border); padding: 0.6rem 0.8rem; border-radius: 6px; font-size: 0.85rem; margin-bottom: 0.5rem;">
+                {{ pn }}
+            </div>
+            {% else %}
+            <span style="color: var(--text-muted); font-size: 0.85rem;">No part numbers assigned.</span>
+            {% endfor %}
+        </div>
+
+    </div>
+</div>
+
+<!-- Component Styles -->
+<style>
+.field-label {
+    display: block;
+    font-size: 0.825rem;
+    color: var(--text-muted);
+    margin-bottom: 0.35rem;
+    font-weight: 500;
+}
+.field-input {
+    width: 100%;
+    padding: 0.6rem;
+    background: var(--bg-primary);
+    border: 1px solid var(--bg-border);
+    color: var(--text-main);
+    border-radius: 6px;
+    outline: none;
+    font-size: 0.9rem;
+}
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: var(--bg-primary);
+    border: 1px solid var(--bg-border);
+    color: var(--text-main);
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    height: 38px;
+    transition: background 0.15s, border-color 0.15s, color 0.15s, opacity 0.15s;
+}
+.action-btn:hover:not(:disabled) {
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+}
+.action-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+.ini-error-banner {
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #f87171;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    line-height: 1.4;
+}
+.spinner-border-sm {
+    border: 0.15em solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: spinner-border 0.75s linear infinite;
+}
+@keyframes spinner-border {
+    100% { transform: rotate(360deg); }
+}
+.d-none {
+    display: none !important;
+}
+
+.port-picker-container {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.port-picker-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #94a3b8;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.port-select-dark {
+    background-color: #0f172a;
+    border: 1px solid #334155;
+    color: #e2e8f0;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 0.875rem;
+    outline: none;
+    transition: border-color 0.2s;
+    min-width: 180px;
+}
+
+.port-select-dark:focus {
+    border-color: #38bdf8;
+}
+
+.btn-port-refresh {
+    background-color: #1e293b;
+    border: 1px solid #334155;
+    color: #94a3b8;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-port-refresh:hover {
+    background-color: #334155;
+    color: #f8fafc;
+}
+</style>
+
+<!-- Component Controller Scripts -->
+<script>
+(function() {
+    const filename = "{{ config.filename }}";
+    const status = "{{ config.status.value }}";
+    
+    if (status !== 'POC') return;
+
+    let pendingChanges = {};
+    let inactivityTimer = null;
+    const INACTIVITY_TIMEOUT = 5 * 60 * 1000;
+
+    document.querySelectorAll('.field-input').forEach(element => {
+        const fieldName = element.getAttribute('name');
+        if (!fieldName) return;
+
+        element.addEventListener('change', (e) => {
+            pendingChanges[fieldName] = e.target.value.trim();
+            resetInactivityTimer();
+        });
+    });
+
+    function resetInactivityTimer() {
+        if (inactivityTimer) clearTimeout(inactivityTimer);
+        inactivityTimer = setTimeout(() => {
+            flushChanges('inactivity');
+        }, INACTIVITY_TIMEOUT);
+    }
+
+    function flushChanges(reason = 'navigation') {
+        if (Object.keys(pendingChanges).length === 0) return;
+
+        const payload = JSON.stringify({
+            filename: filename,
+            changes: pendingChanges,
+            reason: reason
+        });
+
+        if (reason === 'navigation' && navigator.sendBeacon) {
+            const blob = new Blob([payload], { type: 'application/json' });
+            navigator.sendBeacon('/configs/api/batch-save', blob);
+            pendingChanges = {};
+        } else {
+            fetch('/configs/api/batch-save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: payload
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    pendingChanges = {};
+                }
+            })
+            .catch(err => console.error('Auto-save error:', err));
+        }
+
+        if (inactivityTimer) clearTimeout(inactivityTimer);
+    }
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') {
+            flushChanges('navigation');
+        }
+    });
+
+    window.addEventListener('beforeunload', () => {
+        flushChanges('navigation');
+    });
+})();
+
+function triggerAction(actionName) {
+    const version = document.getElementById('target-version').value;
+    alert(`Triggered: ${actionName} for {{ config.config_name }} (${version})`);
+}
+
+function generateIni() {
+  const btn = document.getElementById("generateIniBtn");
+  const spinner = document.getElementById("iniBtnSpinner");
+  const btnText = document.getElementById("iniBtnText");
+  const errorAlert = document.getElementById("iniErrorAlert");
+  const errorMessage = document.getElementById("iniErrorMessage");
+
+  const startTime = Date.now();
+  const MIN_LOADING_TIME = 2000;
+
+  btn.disabled = true;
+  spinner.classList.remove("d-none");
+  btnText.innerText = " Generating INI...";
+  errorAlert.classList.add("d-none");
+  errorMessage.innerText = "";
+
+  const targetVersion = document.getElementById("target-version").value;
+  const formData = new FormData();
+  formData.append("target_version", targetVersion);
+
+  fetch(`/configs/view/{{ config.filename }}/generate/ini`, {
+    method: "POST",
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+    const elapsedTime = Date.now() - startTime;
+    const remainingDelay = Math.max(0, MIN_LOADING_TIME - elapsedTime);
+
+    setTimeout(() => {
+      btn.disabled = false;
+      spinner.classList.add("d-none");
+      btnText.innerText = "Generate INI";
+
+      if (data.success) {
+        const blob = new Blob([data.content], { type: "text/plain" });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = data.filename;
+        a.click();
+        window.URL.revokeObjectURL(url);
+      } else {
+        errorMessage.innerText = data.error || "Failed to generate INI file.";
+        errorAlert.classList.remove("d-none");
+      }
+    }, remainingDelay);
+  })
+  .catch(err => {
+    const elapsedTime = Date.now() - startTime;
+    const remainingDelay = Math.max(0, MIN_LOADING_TIME - elapsedTime);
+
+    setTimeout(() => {
+      btn.disabled = false;
+      spinner.classList.add("d-none");
+      btnText.innerText = "Generate INI";
+      
+      errorMessage.innerText = "An unexpected error occurred while communicating with the server.";
+      errorAlert.classList.remove("d-none");
+    }, remainingDelay);
+  });
+}
+
+function generateProfileBin() {
+  const btn = document.getElementById("generateBinBtn");
+  const spinner = document.getElementById("binBtnSpinner");
+  const btnText = document.getElementById("binBtnText");
+  const errorAlert = document.getElementById("iniErrorAlert");
+  const errorMessage = document.getElementById("iniErrorMessage");
+
+  const startTime = Date.now();
+  const MIN_LOADING_TIME = 2000;
+
+  btn.disabled = true;
+  if (spinner) spinner.classList.remove("d-none");
+  if (btnText) btnText.innerText = " Generating BIN...";
+  errorAlert.classList.add("d-none");
+  errorMessage.innerText = "";
+
+  const targetVersion = document.getElementById("target-version").value;
+  const formData = new FormData();
+  formData.append("target_version", targetVersion);
+
+  fetch(`/configs/view/{{ config.filename }}/generate/bin`, {
+    method: "POST",
+    body: formData
+  })
+  .then(async response => {
+    const elapsedTime = Date.now() - startTime;
+    const remainingDelay = Math.max(0, MIN_LOADING_TIME - elapsedTime);
+
+    if (response.ok) {
+      const blob = await response.blob();
+      setTimeout(() => {
+        btn.disabled = false;
+        if (spinner) spinner.classList.add("d-none");
+        if (btnText) btnText.innerText = "Generate Profile BIN";
+
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `{{ config.config_name }}_${targetVersion}.bin`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+      }, remainingDelay);
+    } else {
+      const data = await response.json();
+      setTimeout(() => {
+        btn.disabled = false;
+        if (spinner) spinner.classList.add("d-none");
+        if (btnText) btnText.innerText = "Generate Profile BIN";
+
+        errorMessage.innerText = data.error || "Failed to generate Profile BIN.";
+        errorAlert.classList.remove("d-none");
+      }, remainingDelay);
+    }
+  })
+  .catch(err => {
+    const elapsedTime = Date.now() - startTime;
+    const remainingDelay = Math.max(0, MIN_LOADING_TIME - elapsedTime);
+
+    setTimeout(() => {
+      btn.disabled = false;
+      if (spinner) spinner.classList.add("d-none");
+      if (btnText) btnText.innerText = "Generate Profile BIN";
+
+      errorMessage.innerText = "An unexpected error occurred while communicating with the server.";
+      errorAlert.classList.remove("d-none");
+    }, remainingDelay);
+  });
+}
+
+function generateFirmwareDck() {
+  const btn = document.getElementById("generateFirmwareBtn");
+  const spinner = document.getElementById("firmwareBtnSpinner");
+  const btnText = document.getElementById("firmwareBtnText");
+  const errorAlert = document.getElementById("iniErrorAlert");
+  const errorMessage = document.getElementById("iniErrorMessage");
+
+  const startTime = Date.now();
+  const MIN_LOADING_TIME = 2000;
+
+  btn.disabled = true;
+  if (spinner) spinner.classList.remove("d-none");
+  if (btnText) btnText.innerText = " Generating Firmware...";
+  errorAlert.classList.add("d-none");
+  errorMessage.innerText = "";
+
+  const targetVersion = document.getElementById("target-version").value;
+  const formData = new FormData();
+  formData.append("target_version", targetVersion);
+
+  fetch(`/configs/view/{{ config.filename }}/generate/firmware`, {
+    method: "POST",
+    body: formData
+  })
+  .then(async response => {
+    const elapsedTime = Date.now() - startTime;
+    const remainingDelay = Math.max(0, MIN_LOADING_TIME - elapsedTime);
+
+    if (response.ok) {
+      const blob = await response.blob();
+      setTimeout(() => {
+        btn.disabled = false;
+        if (spinner) spinner.classList.add("d-none");
+        if (btnText) btnText.innerText = "Generate Firmware DCK";
+
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `{{ config.config_name }}_${targetVersion}.dck`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+      }, remainingDelay);
+    } else {
+      const data = await response.json();
+      setTimeout(() => {
+        btn.disabled = false;
+        if (spinner) spinner.classList.add("d-none");
+        if (btnText) btnText.innerText = "Generate Firmware DCK";
+
+        errorMessage.innerText = data.error || "Failed to generate Firmware DCK.";
+        errorAlert.classList.remove("d-none");
+      }, remainingDelay);
+    }
+  })
+  .catch(err => {
+    const elapsedTime = Date.now() - startTime;
+    const remainingDelay = Math.max(0, MIN_LOADING_TIME - elapsedTime);
+
+    setTimeout(() => {
+      btn.disabled = false;
+      if (spinner) spinner.classList.add("d-none");
+      if (btnText) btnText.innerText = "Generate Firmware DCK";
+
+      errorMessage.innerText = "An unexpected error occurred while communicating with the server.";
+      errorAlert.classList.remove("d-none");
+    }, remainingDelay);
+  });
+}
+
+function generateTokens() {
+  const btn = document.getElementById("generateTokensBtn");
+  const spinner = document.getElementById("tokensBtnSpinner");
+  const btnText = document.getElementById("tokensBtnText");
+  const errorAlert = document.getElementById("iniErrorAlert");
+  const errorMessage = document.getElementById("iniErrorMessage");
+
+  const tokensContainer = document.getElementById("tokensContainer");
+  const profileTokenLabel = document.getElementById("profileTokenLabel");
+  const profileTokenVal = document.getElementById("profileTokenVal");
+  const firmwareTokenLabel = document.getElementById("firmwareTokenLabel");
+  const firmwareTokenVal = document.getElementById("firmwareTokenVal");
+
+  const startTime = Date.now();
+  const MIN_LOADING_TIME = 2000;
+
+  btn.disabled = true;
+  if (spinner) spinner.classList.remove("d-none");
+  if (btnText) btnText.innerText = " Querying Tokens...";
+  errorAlert.classList.add("d-none");
+  tokensContainer.classList.add("d-none");
+
+  const targetVersion = document.getElementById("target-version").value;
+  const formData = new FormData();
+  formData.append("target_version", targetVersion);
+
+  fetch(`/configs/view/{{ config.filename }}/generate/tokens`, {
+    method: "POST",
+    body: formData
+  })
+  .then(res => res.json())
+  .then(data => {
+    const elapsedTime = Date.now() - startTime;
+    const remainingDelay = Math.max(0, MIN_LOADING_TIME - elapsedTime);
+
+    setTimeout(() => {
+      btn.disabled = false;
+      if (spinner) spinner.classList.add("d-none");
+      if (btnText) btnText.innerText = "Generate Tokens";
+
+      if (data.success) {
+        const d = data.data;
+
+        profileTokenLabel.innerText = `${d.profile_token_name} ${d.profile_cached ? "(Cached)" : "(New)"}:`;
+        profileTokenVal.innerText = d.profile_token;
+
+        firmwareTokenLabel.innerText = `${d.firmware_token_name} ${d.firmware_cached ? "(Cached)" : "(New)"}:`;
+        firmwareTokenVal.innerText = d.firmware_token;
+
+        tokensContainer.classList.remove("d-none");
+      } else {
+        errorMessage.innerText = data.error || "Failed to generate tokens.";
+        errorAlert.classList.remove("d-none");
+      }
+    }, remainingDelay);
+  })
+  .catch(err => {
+    const elapsedTime = Date.now() - startTime;
+    const remainingDelay = Math.max(0, MIN_LOADING_TIME - elapsedTime);
+
+    setTimeout(() => {
+      btn.disabled = false;
+      if (spinner) spinner.classList.add("d-none");
+      if (btnText) btnText.innerText = "Generate Tokens";
+
+      errorMessage.innerText = "An unexpected error occurred while communicating with PocketBase.";
+      errorAlert.classList.remove("d-none");
+    }, remainingDelay);
+  });
+}
+
+function generateWalletQr(envType) {
+  const isProd = envType.toLowerCase() === "production";
+  const btn = document.getElementById(isProd ? "genProdQrBtn" : "genStagingQrBtn");
+  const spinner = document.getElementById(isProd ? "prodQrSpinner" : "stagingQrSpinner");
+  const btnText = document.getElementById(isProd ? "prodQrBtnText" : "stagingQrBtnText");
+  const originalText = isProd ? "Generate Production Wallet QR" : "Generate Staging Wallet QR";
+  
+  const errorAlert = document.getElementById("iniErrorAlert");
+  const errorMessage = document.getElementById("iniErrorMessage");
+
+  const startTime = Date.now();
+  const MIN_LOADING_TIME = 2000;
+
+  btn.disabled = true;
+  if (spinner) spinner.classList.remove("d-none");
+  if (btnText) btnText.innerText = " Generating Wallet Pass...";
+  if (errorAlert) errorAlert.classList.add("d-none");
+  if (errorMessage) errorMessage.innerText = "";
+
+  const formData = new FormData();
+  formData.append("environment", envType);
+
+  fetch(`/configs/view/{{ config.filename }}/generate/wallet-pass`, {
+    method: "POST",
+    body: formData
+  })
+  .then(res => res.json())
+  .then(data => {
+    const elapsedTime = Date.now() - startTime;
+    const remainingDelay = Math.max(0, MIN_LOADING_TIME - elapsedTime);
+
+    setTimeout(() => {
+      btn.disabled = false;
+      if (spinner) spinner.classList.add("d-none");
+      if (btnText) btnText.innerText = originalText;
+
+      if (data.success) {
+        const qrContainer = document.getElementById("walletQrContainer");
+        const qrImg = document.getElementById("walletQrImg");
+        const qrTitle = document.getElementById("walletQrTitle");
+        const qrSub = document.getElementById("walletQrSub");
+
+        qrTitle.innerText = `${data.environment.toUpperCase()} WALLET PASS`;
+        qrSub.innerText = `Keyset ID: ${data.keyset_id} | Link: ${data.wallet_url}`;
+        qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data.wallet_url)}`;
+        qrContainer.classList.remove("d-none");
+      } else {
+        if (errorMessage && errorAlert) {
+          errorMessage.innerText = data.error || "Failed to generate Wallet Pass.";
+          errorAlert.classList.remove("d-none");
+        } else {
+          alert(`Error generating wallet pass: ${data.error}`);
+        }
+      }
+    }, remainingDelay);
+  })
+  .catch(err => {
+    const elapsedTime = Date.now() - startTime;
+    const remainingDelay = Math.max(0, MIN_LOADING_TIME - elapsedTime);
+
+    setTimeout(() => {
+      btn.disabled = false;
+      if (spinner) spinner.classList.add("d-none");
+      if (btnText) btnText.innerText = originalText;
+
+      if (errorMessage && errorAlert) {
+        errorMessage.innerText = "An unexpected network error occurred while communicating with the server.";
+        errorAlert.classList.remove("d-none");
+      } else {
+        alert("Network error communicating with CALIGA backend.");
+      }
+    }, remainingDelay);
+  });
+}
+
+async function loadOsdpPorts() {
+  const select = document.getElementById('osdp-port-select');
+  select.innerHTML = '<option value="">Scanning...</option>';
+  try {
+    const res = await fetch('/api/ports');
+    const data = await res.json();
+    select.innerHTML = '';
+    
+    if (!data.ports || data.ports.length === 0) {
+      select.innerHTML = '<option value="">No serial ports found</option>';
+      return;
+    }
+    
+    data.ports.forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = p.device;
+      opt.textContent = `${p.device} (${p.description})`;
+      select.appendChild(opt);
+    });
+  } catch (err) {
+    select.innerHTML = '<option value="">Failed to scan ports</option>';
+  }
+}
+
+async function triggerProfileFlash() {
+  const port = document.getElementById('osdp-port-select').value;
+  if (!port) return alert("Select a serial port first.");
+
+  const response = await fetch('/testing/flash-profile', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ port: port })
+  });
+  const data = await response.json();
+  alert(data.message || data.error);
+}
+
+async function triggerFirmwareFlash() {
+  const port = document.getElementById('osdp-port-select').value;
+  if (!port) return alert("Select a serial port first.");
+
+  const response = await fetch('/testing/flash-firmware', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ port: port })
+  });
+  const data = await response.json();
+  alert(data.message || data.error);
+}
+
+document.addEventListener('DOMContentLoaded', loadOsdpPorts);
+</script>
+{% endblock %}

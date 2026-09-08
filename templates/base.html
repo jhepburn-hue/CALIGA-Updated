@@ -1,0 +1,32 @@
+<!-- Base Template Layout -->
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Caliga Workspace{% endblock %}</title> <!-- Page Title Block -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/variables.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+</head>
+<body>
+    <!-- Main Navigation Header -->
+    <header>
+        <a href="/" class="brand">Caliga</a>
+        <nav>
+            <a href="/">Dashboard</a>
+            <a href="/configs">Configurations</a>
+            <a href="/testing">Testing Portal</a>
+            <a href="/tools">Tools</a>
+        </nav>
+        <button id="theme-toggle" class="theme-toggle-btn">Dark</button>
+    </header>
+
+    <!-- Content Region -->
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Global Scripts -->
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+</body>
+</html>

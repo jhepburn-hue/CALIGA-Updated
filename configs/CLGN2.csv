@@ -1,0 +1,75 @@
+Allegion (Allegion Test Keys and Wallet TRA On),,,,,
+End User Configuration Form,,,,,Card Details
+Config Name,CLGN1,,,,Card Type
+Config ID,333,,,,Bitstream
+STEP 1: Hardware,,,,,Facility Code
+Wiegand/OSDP,ET10,ET20,ET25,,Starting Badge
+-2WS,No,No,No,,Notes
+-3WS,No,No,No,,
+-6WS,Yes,Yes,Yes,,
+-7WS,Yes,Yes,Yes,,
+,,,,,
+F2F,ET10,ET20,ET25,,Part Numbers
+-7FM,No,No,No,,
+,,,,,
+MCLP,ET10,ET20,ET25,,
+-7FM,No,No,No,,Notes/Other Products
+,,,,,"Same as CLGN1 but with TRA Enabled. 
+
+ALLEGION_TEST is the keyset_id"
+STEP 2: Custom Keyset,,,,,
+Custom Keyset (LEAF Cc),,Enabled,,,
+Keyset ID (LkXXXXX),,ALLEGION_TEST,,,
+LEAF Customer Code (Decimal),,,,,
+STEP 3: AV + Output Formats,,,,,
+Wiegand/OSDP,,,,,
+Idle LED,,Red,,,
+Credential Report LED,,Green,,,
+Beeper,,On,,,
+Keypad Format,,8-bit,,,
+Tamper Monitoring,,On,,,
+F2F,,,,,
+Casi Output Format,,CASI-4002,,,
+Supervision State,,2-State,,,
+Tamper Monitoring,,On,,,
+STEP 4: High Frequency (HF),,,,,
+Leaf Si Application (Kv1),,Leaf Si,,,
+Leaf Cc Application (Kc1),,Leaf Cc,,,
+Other Custom HF Application,,None,,,
+"Custom
+Application
+Notes",Kc1 of ALLEGION_TEST and Kv1 of LK00001,,,,
+,,,,,
+,,,,,
+STEP 5: Card Serial Number (CSN),,,,,
+MFC CSN,,Off,CSN_32_BIT_MSB,,
+EV1/EV2 CSN,,Off,CSN_32_BIT_MSB,,
+iClass CSN,,Off,CSN_32_BIT_MSB,,
+ISO15693 CSN,,Off,CSN_32_BIT_MSB,,
+ISO14443A CSN,,Off,,,
+STEP 6: Low Frequency (LF),,,,,
+FSK Prox,,On,,,
+ASK Prox,,On,,,
+Prox Filter,,,,,
+Prox Filter,,Off,,,
+"Prox
+Filter
+Description",,,,,
+,,,,,
+,,,,,
+STEP 7: Mobile,,,,,
+BLE Advertising Config,,Unique (Differs),,,
+BLE Functionality,,Admin Only,,,
+NFC Functionality,,Enabled,,,
+Mobile Keyset,,Custom,,,
+"Legacy Credentials (Sym Blue, Brivo)",,Off,,,
+Transport Mode,,Off,,,
+ECP DESFire,,Enabled,,,
+ECP TCI,,023400,,,
+Apple Meridian Bit Count,,40,,,
+MiFare2Go,,Enabled,,,
+MiFare2Go DFNAME,,A00000039656434103F532F000023400,,,
+Mobile Notes,,,,,
+STEP 8: Part Numbers,,,,,
+"Assigned 
+Part Numbers",ETxx-xWS-CLGN2,,,,
