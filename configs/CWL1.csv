@@ -4,7 +4,7 @@ Config Name,CWL1,,,,Card Type
 Config ID,0,,,,
 STEP 1: Hardware,,,,,Format/Bitstream
 Wiegand/OSDP,ET10,ET20,ET25,,Facility Code
--2WS,Yes,Yes,Yes,,Starting Badge
+-2WS,Yes,No,Yes,,Starting Badge
 -3WS,Yes,Yes,Yes,,Notes
 -6WS,Yes,Yes,Yes,,
 -7WS,Yes,Yes,Yes,,

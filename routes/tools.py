@@ -70,6 +70,55 @@ def translate_tool():
     all_configs = loader.list_all_configurations()
     return render_template("ini-translator.html", configs=all_configs)
 
+@tools_bp.route("/api/translate-ini", methods=["POST"])
+def translate_ini_api():
+    """API endpoint to handle INI translation requests from uploaded files or stored configs.
+
+    Returns:
+        Response: JSON payload containing parsed test cards and raw INI text.
+    """
+    target_version = request.form.get("target_version", "v5.4.11")
+    filename = request.form.get("filename")
+    file_obj = request.files.get("ini_file")
+
+    try:
+        raw_ini = ""
+        resolved_filename = ""
+
+        if file_obj and file_obj.filename:
+            raw_ini = file_obj.read().decode("utf-8", errors="ignore")
+            resolved_filename = file_obj.filename
+        elif filename:
+            configs_dir = Path(__file__).parent.parent / "configs"
+            csv_path = configs_dir / filename
+            if not csv_path.exists():
+                return jsonify({"success": False, "error": f"Configuration CSV '{filename}' not found."}), 404
+            
+            config_obj = loader.load_by_filename(filename)
+            raw_ini = forge_client.upload_csv_and_generate_ini(
+                csv_file_path=csv_path,
+                target_version=target_version,
+                config_obj=config_obj,
+            )
+            resolved_filename = f"{csv_path.stem}.ini"
+        else:
+            return jsonify({"success": False, "error": "Please provide a configuration or file."}), 400
+
+        # Import and invoke the standalone function
+        from core.translators.ini_interpreter import interpret_ini_to_cards
+
+        test_cards = interpret_ini_to_cards(raw_ini_text=raw_ini, config_name=resolved_filename)
+
+        return jsonify({
+            "success": True,
+            "filename": resolved_filename,
+            "raw_ini": raw_ini,
+            "cards": test_cards,
+        })
+
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
 
 @tools_bp.route("/yaml", methods=["GET", "POST"])
 def yaml_tool():

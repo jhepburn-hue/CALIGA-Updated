@@ -5,6 +5,9 @@ import json
 import os
 import re
 from pathlib import Path
+import threading
+import time
+from flask import Response
 from flask import (
     Blueprint,
     flash,
@@ -23,6 +26,7 @@ from services.osdp_flasher import OsdpFlasher
 from services.pocketbase_client import PocketBaseClient
 from services.relay_client import RelayClient
 from services.slack_client import SlackNotificationManager
+from osdp_library.utils.port_inspector import PortInspector
 
 configs_bp = Blueprint("configs", __name__, url_prefix="/configs")
 testing_bp = Blueprint("testing", __name__)
@@ -1017,6 +1021,17 @@ def generate_wallet_pass(filename: str):
         return jsonify({"success": False, "error": str(e)}), 500
 
 
+@configs_bp.route('/scan_ports', methods=['GET'])
+def scan_ports():
+    """Scans system for connected serial ports and returns them as a list of strings."""
+    try:
+        inspector = PortInspector()
+        ports = inspector.find_and_get_ports()
+        return jsonify({'success': True, 'ports': ports})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e), 'ports': []}), 500
+
+
 @testing_bp.route("/testing/flash-profile", methods=["POST"])
 def flash_profile_route():
     """Flashes a profile BIN file over OSDP serial connection.
@@ -1147,3 +1162,125 @@ def flash_firmware_route():
         return jsonify(
             {"success": False, "error": f"Firmware Flash Error: {str(e)}"}
         ), 500
+
+@configs_bp.route("/view/<filename>/flash-osdp", methods=["POST"])
+def flash_osdp_stream(filename: str):
+    """Server-Sent Events (SSE) streaming endpoint for compiling a binary artifact
+    and flashing it directly to a physical reader over an OSDP serial port.
+
+    Args:
+        filename (str): Target configuration CSV filename.
+
+    Returns:
+        Response: SSE Event Stream Response displaying real-time progress.
+    """
+    port = request.form.get("port")
+    build_type = request.form.get("build_type", "profile")
+    target_version = request.form.get("target_version", "v5.4.11")
+
+    is_firmware = (build_type == "firmware")
+    config_name = filename.rsplit(".", 1)[0]
+    csv_path = CONFIGS_DIR / filename
+
+    def generate_events():
+        def send_status(msg, percent, error=False):
+            data = json.dumps({"status": msg, "percent": percent, "error": error})
+            return f"data: {data}\n\n"
+
+        if not port:
+            yield send_status("Error: No OSDP serial port selected.", 0, error=True)
+            return
+
+        if not csv_path.exists():
+            yield send_status(f"Error: CSV file '{filename}' not found.", 0, error=True)
+            return
+
+        yield send_status("Fetching compiled binary from Forge/GCS...", 10)
+        
+        try:
+            forge = ForgeClient()
+            config_obj = loader.load_by_filename(filename)
+
+            if is_firmware:
+                bin_bytes, downloaded_filename = forge.upload_csv_and_generate_firmware(
+                    csv_file_path=csv_path, target_version=target_version, config_obj=config_obj
+                )
+            else:
+                bin_bytes, downloaded_filename = forge.upload_csv_and_generate_bin(
+                    csv_file_path=csv_path, target_version=target_version, config_obj=config_obj
+                )
+        except Exception as e:
+            yield send_status(f"Forge Build Exception: {str(e)}", 0, error=True)
+            return
+
+        if not bin_bytes:
+            yield send_status("Failed to retrieve compiled binary asset.", 0, error=True)
+            return
+
+        downloaded_filename = downloaded_filename or (
+            f"{config_name}.dck" if is_firmware else f"{config_name}.bin"
+        )
+        yield send_status(f"Binary ready: {downloaded_filename}", 30)
+
+        temp_dir = Path("/tmp/generated")
+        temp_dir.mkdir(parents=True, exist_ok=True)
+        temp_bin_path = temp_dir / downloaded_filename
+
+        try:
+            temp_bin_path.write_bytes(bin_bytes)
+        except Exception as e:
+            yield send_status(f"Failed to save temporary binary: {str(e)}", 0, error=True)
+            return
+
+        try:
+            yield send_status(f"Connecting to OSDP reader on {port}...", 35)
+            flasher = OsdpFlasher(port=port)
+            flasher.connect()
+
+            progress_events = []
+
+            def _progress_callback(pct):
+                # Scale OSDP transfer percentage to 35% -> 100% on progress bar
+                scaled_pct = 35 + int((pct / 100.0) * 65)
+                progress_events.append(scaled_pct)
+
+            flash_success = False
+            flash_error_msg = None
+            ft_type_code = 1 if is_firmware else 2
+
+            # Execute flashing in background thread so loop can yield SSE events
+            def _flash_thread_worker():
+                nonlocal flash_success, flash_error_msg
+                try:
+                    flash_success = flasher.flash_binary_file(
+                        file_path=temp_bin_path,
+                        progress_callback=_progress_callback,
+                        ft_type=ft_type_code
+                    )
+                except Exception as ex:
+                    flash_error_msg = str(ex)
+
+            flash_thread = threading.Thread(target=_flash_thread_worker)
+            flash_thread.start()
+
+            # Stream progress percentage updates while thread runs
+            while flash_thread.is_alive() or progress_events:
+                while progress_events:
+                    latest_pct = progress_events.pop(0)
+                    yield send_status("Transferring binary data to reader...", latest_pct)
+                time.sleep(0.2)
+
+            flash_thread.join()
+
+            if flash_success:
+                yield send_status("Flashing Complete! Reader is rebooting with new configuration.", 100)
+            else:
+                err_text = flash_error_msg or "OSDP file transfer rejected by reader."
+                yield send_status(f"Flashing failed: {err_text}", 0, error=True)
+
+        except Exception as e:
+            yield send_status(f"OSDP Flashing Exception: {str(e)}", 0, error=True)
+        finally:
+            temp_bin_path.unlink(missing_ok=True)
+
+    return Response(generate_events(), mimetype="text/event-stream")

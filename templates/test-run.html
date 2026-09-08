@@ -20,36 +20,36 @@
                 <p style="color: var(--text-muted); font-size: 0.875rem; margin: 0.35rem 0 0 0;">Perform step-by-step verification checks against hardware.</p>
             </div>
 
-            <!-- OSDP Actions & Tester Selector -->
-            <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-                <button id="flashBinBtn" class="action-btn" onclick="flashProfileBin()">
-                    <span id="flashBinSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-                    <span id="flashBinText">Flash Profile BIN</span>
-                </button>
-                <button id="flashFirmwareBtn" class="action-btn" onclick="flashFirmwareDck()">
-                    <span id="flashFirmwareSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-                    <span id="flashFirmwareText">Flash Firmware DCK</span>
-                </button>
+            <button id="flashBinBtn" class="action-btn" onclick="triggerOsdpFlashing('profile')">
+                <span id="flashBinBtnSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true" style="width: 0.85rem; height: 0.85rem; border-width: 0.15em;"></span>
+                <span id="flashBinBtnText">Flash Profile BIN</span>
+            </button>
+            <button id="flashFirmwareBtn" class="action-btn" onclick="triggerOsdpFlashing('firmware')">
+                <span id="flashFirmwareBtnSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true" style="width: 0.85rem; height: 0.85rem; border-width: 0.15em;"></span>
+                <span id="flashFirmwareBtnText">Flash Firmware DCK</span>
+            </button>
 
-                <div style="display: flex; align-items: center; gap: 0.5rem; margin-left: 0.5rem;">
-                    <label style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;"><span style="color: #ef4444;">*</span> Tester Name:</label>
-                    <select id="assigneeSelect" onchange="updateAssignee(this.value)" style="background: var(--bg-primary); border: 1px solid var(--bg-border); color: var(--text-main); padding: 0.45rem 0.8rem; border-radius: 6px; font-size: 0.875rem;">
-                        {% for member in team_members %}
-                            <option value="{{ member }}" {% if member == test_case.assigned_to %}selected{% endif %}>{{ member }}</option>
-                        {% endfor %}
-                    </select>
+            <!-- OSDP Serial Port Selection -->
+            <div class="osdp-port-wrapper">
+                <select id="osdp_port_select" class="osdp-port-select">
+                    <option value="">-- Select Port --</option>
+                </select>
+            </div>
+
+            <!-- Flashing Progress Container -->
+            <div id="flashProgressContainer" class="d-none" style="margin-top: 0.5rem; padding: 1.25rem; background: var(--bg-primary); border: 1px solid var(--bg-border); border-radius: 8px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <span id="flashStatusTitle" style="font-size: 0.9rem; font-weight: 700; color: var(--accent-primary);">Flashing Reader...</span>
+                    <span id="flashPercentText" style="font-family: monospace; font-size: 0.9rem; font-weight: 700; color: var(--text-main);">0%</span>
                 </div>
 
-                <!-- OSDP Port Picker -->
-                <div class="port-picker-container mb-3">
-                    <span class="port-picker-label">Serial / RS-485 Port:</span>
-                    <select id="osdp-port-select" class="port-select-dark">
-                        <option value="">Scanning ports...</option>
-                    </select>
-                    <button class="btn-port-refresh" type="button" onclick="loadOsdpPorts()" title="Refresh Ports">
-                        &#8635;
-                    </button>
+                <!-- Progress Bar Track -->
+                <div style="background: var(--bg-surface); border: 1px solid var(--bg-border); border-radius: 6px; height: 16px; overflow: hidden; margin-bottom: 0.75rem;">
+                    <div id="flashProgressBar" style="background: var(--accent-primary); width: 0%; height: 100%; transition: width 0.2s ease;"></div>
                 </div>
+
+                <!-- Live Status Text Output -->
+                <div id="flashStatusSub" style="font-size: 0.8rem; color: var(--text-muted); font-family: monospace;">Connecting to OSDP reader...</div>
             </div>
         </div>
     </div>
@@ -208,6 +208,50 @@
     background-color: #334155;
     color: #f8fafc;
 }
+
+.osdp-port-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.osdp-port-select {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 38px;
+    width: 170px;
+    padding: 0 2.25rem 0 0.85rem;
+    background: var(--bg-primary);
+    border: 1px solid var(--bg-border);
+    color: var(--text-main);
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 0.85em;
+    transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.osdp-port-select:hover:not(:disabled) {
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+}
+
+.osdp-port-select:focus {
+    border-color: var(--accent-primary);
+}
+
+.osdp-port-select option {
+    background: var(--bg-surface);
+    color: var(--text-main);
+}
 </style>
 
 <!-- Component Controller Script -->
@@ -299,56 +343,141 @@ function submitTestRun() {
     });
 }
 
-async function loadOsdpPorts() {
-  const select = document.getElementById('osdp-port-select');
-  select.innerHTML = '<option value="">Scanning...</option>';
-  try {
-    const res = await fetch('/api/ports');
-    const data = await res.json();
-    select.innerHTML = '';
-    
-    if (!data.ports || data.ports.length === 0) {
-      select.innerHTML = '<option value="">No serial ports found</option>';
-      return;
-    }
-    
-    data.ports.forEach(p => {
-      const opt = document.createElement('option');
-      opt.value = p.device;
-      opt.textContent = `${p.device} (${p.description})`;
-      select.appendChild(opt);
+function loadOsdpPorts() {
+  const portSelect = document.getElementById('osdp_port_select');
+  if (!portSelect) return;
+
+  portSelect.innerHTML = '<option value="">Scanning ports...</option>';
+
+  fetch('/configs/scan_ports')
+    .then(res => {
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return res.json();
+    })
+    .then(data => {
+      portSelect.innerHTML = '';
+      const ports = data.ports || [];
+
+      if (ports.length > 0) {
+        ports.forEach(port => {
+          const opt = document.createElement('option');
+          const portVal = (typeof port === 'object' && port !== null) ? port.device : port;
+          const portLabel = (typeof port === 'object' && port !== null) ? (port.description || port.device) : port;
+
+          opt.value = portVal;
+          opt.textContent = portLabel;
+          portSelect.appendChild(opt);
+        });
+      } else {
+        portSelect.innerHTML = '<option value="">No Ports Found</option>';
+      }
+    })
+    .catch(err => {
+      console.error('Scan error:', err);
+      portSelect.innerHTML = '<option value="">Failed to scan ports</option>';
     });
-  } catch (err) {
-    select.innerHTML = '<option value="">Failed to scan ports</option>';
-  }
 }
 
-async function triggerProfileFlash() {
-  const port = document.getElementById('osdp-port-select').value;
-  if (!port) return alert("Select a serial port first.");
+document.addEventListener('DOMContentLoaded', () => {
+  loadOsdpPorts();
+});
 
-  const response = await fetch('/testing/flash-profile', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ port: port })
-  });
-  const data = await response.json();
-  alert(data.message || data.error);
+function triggerOsdpFlashing(buildType = 'profile') {
+    const portSelect = document.getElementById('osdp_port_select');
+    const port = portSelect ? portSelect.value : '';
+
+    if (!port) {
+        alert('Please select an OSDP serial port first.');
+        return;
+    }
+
+    // Show Progress Container
+    const container = document.getElementById('flashProgressContainer');
+    const statusTitle = document.getElementById('flashStatusTitle');
+    const statusSub = document.getElementById('flashStatusSub');
+    const progressBar = document.getElementById('flashProgressBar');
+    const percentText = document.getElementById('flashPercentText');
+
+    container.classList.remove('d-none');
+    statusTitle.innerText = `Flashing ${buildType.toUpperCase()}...`;
+    statusSub.innerText = 'Connecting to OSDP flasher...';
+    progressBar.style.width = '0%';
+    progressBar.style.backgroundColor = 'var(--accent-primary)';
+    percentText.innerText = '0%';
+
+    const formData = new FormData();
+    formData.append('port', port);
+    formData.append('build_type', buildType);
+    formData.append('target_version', VERSION);
+    formData.append('config_filename', FILENAME);
+
+    let isCompleted = false;
+
+    // Call the testing route endpoint
+    fetch(`/testing/flash-osdp`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Server returned HTTP ${response.status}`);
+        }
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        function readStream() {
+            reader.read().then(({ done, value }) => {
+                if (done) return;
+
+                buffer += decoder.decode(value, { stream: true });
+                const lines = buffer.split('\n');
+                buffer = lines.pop();
+
+                for (const line of lines) {
+                    const trimmed = line.trim();
+                    if (trimmed.startsWith('data:')) {
+                        const jsonStr = trimmed.replace(/^data:\s*/, '');
+                        if (!jsonStr) continue;
+
+                        try {
+                            const event = JSON.parse(jsonStr);
+
+                            statusSub.innerText = event.status;
+                            progressBar.style.width = `${event.percent}%`;
+                            percentText.innerText = `${event.percent}%`;
+
+                            if (event.error) {
+                                if (!isCompleted) {
+                                    isCompleted = true;
+                                    progressBar.style.backgroundColor = '#f87171';
+                                    alert(`Flashing Error: ${event.status}`);
+                                }
+                                return;
+                            }
+
+                            if (event.percent === 100 && !isCompleted) {
+                                isCompleted = true;
+                                progressBar.style.backgroundColor = '#10b981';
+                                setTimeout(() => {
+                                    alert('Flashing Complete! Reader is rebooting.');
+                                }, 600);
+                            }
+                        } catch (err) {
+                            console.error('SSE JSON Parsing Error:', err, jsonStr);
+                        }
+                    }
+                }
+                readStream();
+            });
+        }
+        readStream();
+    })
+    .catch(err => {
+        alert(`Failed to connect to flasher: ${err.message}`);
+        statusSub.innerText = 'Connection failed.';
+        progressBar.style.backgroundColor = '#f87171';
+    });
 }
-
-async function triggerFirmwareFlash() {
-  const port = document.getElementById('osdp-port-select').value;
-  if (!port) return alert("Select a serial port first.");
-
-  const response = await fetch('/testing/flash-firmware', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ port: port })
-  });
-  const data = await response.json();
-  alert(data.message || data.error);
-}
-
-document.addEventListener('DOMContentLoaded', loadOsdpPorts);
 </script>
 {% endblock %}
